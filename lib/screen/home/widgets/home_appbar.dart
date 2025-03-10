@@ -12,10 +12,10 @@ class HomeAppbar extends StatelessWidget {
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
-            height: 1, // kc cách dòng
+            height: 1,
           ),
         ),
-        const Spacer(), // ~ SizedBox()
+        const Spacer(),
         IconButton(
           onPressed: () {},
           style: IconButton.styleFrom(

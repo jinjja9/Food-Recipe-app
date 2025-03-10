@@ -1,9 +1,11 @@
+import 'package:app/models/asian_food.dart';
+import 'package:app/screen/home/widgets/home_appbar.dart';
+import 'package:app/screen/home/widgets/home_search_bar.dart';
 import 'package:app/widgets/categories.dart';
-import 'package:app/widgets/home_appbar.dart';
-import 'package:app/widgets/home_search_bar.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/quick_and_fast_list.dart';
+import '../../models/food.dart';
+import '../../widgets/recommend_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +16,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentCat = 'All';
+  List<Food> selectedFoods = foods;
+
+  void updateFoodList(String category) {
+    setState(() {
+      currentCat = category;
+      if (category == 'All') {
+        selectedFoods = foods;
+      } else if (category == 'Món Việt') {
+        selectedFoods = foodsAsian;
+      } else {
+        selectedFoods = [];
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +67,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Categories(currentCat: currentCat),
+              Categories(
+                currentCat: currentCat,
+                onCategorySelected: updateFoodList,
+              ),
               const SizedBox(height: 20),
-              const QuickAndFastList(),
+              QuickAndFastList(foods: selectedFoods),
             ],
           ),
         ),

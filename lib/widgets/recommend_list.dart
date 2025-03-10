@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../home/quick_foods_screen.dart';
-import '../home/recipe_screen.dart';
 import '../models/food.dart';
+import '../screen/home/recipe_screen.dart';
+import '../screen/home/recommend_foods_screen.dart';
 
 class QuickAndFastList extends StatelessWidget {
-  const QuickAndFastList({super.key});
+  final List<Food> foods;
+  const QuickAndFastList({super.key, required this.foods});
 
   @override
   Widget build(BuildContext context) {

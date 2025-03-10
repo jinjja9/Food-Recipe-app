@@ -1,4 +1,4 @@
-import 'package:app/home/main_screen.dart';
+import 'package:app/screen/sign_in_up/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      home: const WelcomeScreen(),
     );
   }
 }

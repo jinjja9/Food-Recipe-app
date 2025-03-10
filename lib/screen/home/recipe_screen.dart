@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/color.dart';
 import '../../models/food.dart';
-import '../core/color.dart';
-import '../widgets/food_counter.dart';
+import '../../widgets/food_counter.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Food food;
