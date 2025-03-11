@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../favorite/FavoriteScreen.dart';
 import 'home_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class _MainScreenState extends State<MainScreen> {
   int currentTab = 0;
   List screens = const [
     HomeScreen(),
-    Scaffold(),
+    FavoriteScreen(),
     Scaffold(),
     Scaffold(),
   ];
@@ -38,7 +39,7 @@ class _MainScreenState extends State<MainScreen> {
                     color: currentTab == 0 ? Colors.indigo[400] : Colors.grey,
                   ),
                   Text(
-                    "Home",
+                    "Trang chủ",
                     style: TextStyle(
                       fontSize: 14,
                       color: currentTab == 0 ? Colors.indigo[400] : Colors.grey,
@@ -54,11 +55,11 @@ class _MainScreenState extends State<MainScreen> {
               child: Column(
                 children: [
                   Icon(
-                    Icons.monitor_heart,
+                    Icons.favorite,
                     color: currentTab == 1 ? Colors.indigo[400] : Colors.grey,
                   ),
                   Text(
-                    "Favorites",
+                    "Yêu thích",
                     style: TextStyle(
                       fontSize: 14,
                       color: currentTab == 1 ? Colors.indigo[400] : Colors.grey,
@@ -74,11 +75,11 @@ class _MainScreenState extends State<MainScreen> {
               child: Column(
                 children: [
                   Icon(
-                    Icons.calendar_month,
+                    Icons.explore,
                     color: currentTab == 2 ? Colors.indigo[400] : Colors.grey,
                   ),
                   Text(
-                    "Meal Plan",
+                    "Khám phá",
                     style: TextStyle(
                       fontSize: 14,
                       color: currentTab == 2 ? Colors.indigo[400] : Colors.grey,
@@ -98,7 +99,7 @@ class _MainScreenState extends State<MainScreen> {
                     color: currentTab == 3 ? Colors.indigo[400] : Colors.grey,
                   ),
                   Text(
-                    "Settings",
+                    "Cá nhân",
                     style: TextStyle(
                       fontSize: 14,
                       color: currentTab == 3 ? Colors.indigo[400] : Colors.grey,

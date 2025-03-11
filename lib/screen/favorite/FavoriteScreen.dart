@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 import '../../models/food.dart';
 import '../../widgets/food_card.dart';
 
-class QuickFoodsScreen extends StatefulWidget {
-  const QuickFoodsScreen({super.key});
+class FavoriteScreen extends StatefulWidget {
+  const FavoriteScreen({super.key});
 
   @override
-  State<QuickFoodsScreen> createState() => _QuickFoodsScreenState();
+  State<FavoriteScreen> createState() => _FavoriteScreenState();
 }
 
-class _QuickFoodsScreenState extends State<QuickFoodsScreen> {
+class _FavoriteScreenState extends State<FavoriteScreen> {
   @override
   Widget build(BuildContext context) {
+    List<Food> favoriteFoods = foods.where((food) => food.isLiked).toList();
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -21,36 +23,22 @@ class _QuickFoodsScreenState extends State<QuickFoodsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        fixedSize: const Size(55, 55),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      color: Colors.black,
-                      icon: const Icon(Icons.arrow_back_ios_new),
-                    ),
-                    const Center(
+                    Center(
                       child: Text(
-                        "Danh sách món ăn",
+                        "Món ăn yêu thích",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 55),
                   ],
                 ),
                 const SizedBox(height: 30),
+                // Hiển thị các món ăn yêu thích
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -60,9 +48,9 @@ class _QuickFoodsScreenState extends State<QuickFoodsScreen> {
                     mainAxisSpacing: 20,
                   ),
                   itemBuilder: (context, index) => FoodCard(
-                    food: foods[index],
+                    food: favoriteFoods[index],
                   ),
-                  itemCount: foods.length,
+                  itemCount: favoriteFoods.length,
                 )
               ],
             ),

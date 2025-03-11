@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/color.dart';
 import '../../models/food.dart';
-import '../../widgets/food_counter.dart';
+import 'food_counter.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Food food;

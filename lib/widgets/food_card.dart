@@ -46,7 +46,7 @@ class FoodCard extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(
-                      Icons.flash_auto,
+                      Icons.flash_on_rounded,
                       size: 18,
                       color: Colors.grey,
                     ),
@@ -62,7 +62,7 @@ class FoodCard extends StatelessWidget {
                       style: TextStyle(color: Colors.grey),
                     ),
                     const Icon(
-                      Icons.lock_clock,
+                      Icons.timelapse,
                       size: 18,
                       color: Colors.grey,
                     ),
@@ -102,13 +102,16 @@ class FoodCard extends StatelessWidget {
               top: 1,
               right: 1,
               child: IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  food.isLiked = !food.isLiked;
+                  (context as Element).markNeedsBuild();
+                },
                 style: IconButton.styleFrom(
                   backgroundColor: Colors.white,
                   fixedSize: const Size(30, 30),
                 ),
                 iconSize: 20,
-                icon: food.isLiked!
+                icon: food.isLiked
                     ? const Icon(
                         Icons.favorite,
                         color: Colors.red,

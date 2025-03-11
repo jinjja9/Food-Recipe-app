@@ -26,7 +26,7 @@ class QuickScreenAppbar extends StatelessWidget {
         ),
         const Spacer(),
         const Text(
-          "Quick & Fast",
+          "Danh sách món ăn",
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,

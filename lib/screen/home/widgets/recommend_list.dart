@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../models/food.dart';
-import '../screen/home/recipe_screen.dart';
-import '../screen/home/recommend_foods_screen.dart';
+import '../../../models/food.dart';
+import '../recipe_screen.dart';
+import '../recommend_foods_screen.dart';
 
-class QuickAndFastList extends StatelessWidget {
-  final List<Food> foods;
-  const QuickAndFastList({super.key, required this.foods});
+class RecommendListList extends StatelessWidget {
+  final List<Food> foods; // Sửa từ 'Food food' thành 'List<Food> foods'
+  const RecommendListList({super.key, required this.foods});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class QuickAndFastList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              "Quick & Fast",
+              "Đề xuất",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -30,7 +30,7 @@ class QuickAndFastList extends StatelessWidget {
                   builder: (context) => const QuickFoodsScreen(),
                 ),
               ),
-              child: const Text("View all"),
+              child: const Text("Xem thêm"),
             ),
           ],
         ),
@@ -39,12 +39,14 @@ class QuickAndFastList extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: List.generate(
-              foods.length,
+              foods.length, // Lấy dữ liệu từ 'foods'
               (index) => GestureDetector(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RecipeScreen(food: foods[index]),
+                    builder: (context) => RecipeScreen(
+                        food: foods[
+                            index]), // Truyền 'foods[index]' thay vì 'food'
                   ),
                 ),
                 child: Container(
@@ -78,7 +80,7 @@ class QuickAndFastList extends StatelessWidget {
                           Row(
                             children: [
                               const Icon(
-                                Icons.flash_auto,
+                                Icons.flash_on_outlined,
                                 size: 18,
                                 color: Colors.grey,
                               ),
@@ -94,7 +96,7 @@ class QuickAndFastList extends StatelessWidget {
                                 style: TextStyle(color: Colors.grey),
                               ),
                               const Icon(
-                                Icons.lock_clock,
+                                Icons.timelapse_sharp,
                                 size: 18,
                                 color: Colors.grey,
                               ),
@@ -113,13 +115,23 @@ class QuickAndFastList extends StatelessWidget {
                         top: 1,
                         right: 1,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Cập nhật trạng thái của isLiked
+                            foods[index].isLiked = !foods[index].isLiked;
+                            // Cập nhật lại UI sau khi thay đổi
+                            (context as Element).markNeedsBuild();
+                          },
                           style: IconButton.styleFrom(
                             backgroundColor: Colors.white,
                             fixedSize: const Size(30, 30),
                           ),
                           iconSize: 20,
-                          icon: const Icon(Icons.favorite),
+                          icon: foods[index].isLiked
+                              ? const Icon(
+                                  Icons.favorite,
+                                  color: Colors.red,
+                                )
+                              : const Icon(Icons.favorite),
                         ),
                       )
                     ],

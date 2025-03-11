@@ -1,11 +1,13 @@
-import 'package:app/models/asian_food.dart';
+import 'package:app/models/vietnam_food.dart';
 import 'package:app/screen/home/widgets/home_appbar.dart';
 import 'package:app/screen/home/widgets/home_search_bar.dart';
 import 'package:app/widgets/categories.dart';
 import 'package:flutter/material.dart';
 
+import '../../models/asian_food.dart';
+import '../../models/eupore_food.dart';
 import '../../models/food.dart';
-import '../../widgets/recommend_list.dart';
+import 'widgets/recommend_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,18 +17,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String currentCat = 'All';
+  String currentCat = 'Tất cả';
   List<Food> selectedFoods = foods;
 
   void updateFoodList(String category) {
     setState(() {
       currentCat = category;
-      if (category == 'All') {
+      if (category == 'Tất cả') {
         selectedFoods = foods;
       } else if (category == 'Món Việt') {
+        selectedFoods = foodsVietNam;
+      } else if (category == 'Món Á') {
         selectedFoods = foodsAsian;
       } else {
-        selectedFoods = [];
+        selectedFoods = foodsEupore;
       }
     });
   }
@@ -60,9 +64,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 20,
               ),
               const Text(
-                'Categories',
+                'Thể loại',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -72,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onCategorySelected: updateFoodList,
               ),
               const SizedBox(height: 20),
-              QuickAndFastList(foods: selectedFoods),
+              RecommendListList(foods: selectedFoods),
             ],
           ),
         ),

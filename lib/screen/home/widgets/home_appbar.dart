@@ -8,11 +8,11 @@ class HomeAppbar extends StatelessWidget {
     return Row(
       children: [
         const Text(
-          'What are you\ncooking today?',
+          'Hôm nay\nnấu món gì?',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 35,
             fontWeight: FontWeight.bold,
-            height: 1,
+            height: 1.3,
           ),
         ),
         const Spacer(),

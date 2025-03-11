@@ -44,7 +44,7 @@ final List<Food> foods = [
     time: 18,
     rate: 4.2,
     reviews: 10,
-    isLiked: false,
+    isLiked: true,
   ),
   Food(
     name: "French Toast",
@@ -71,7 +71,7 @@ final List<Food> foods = [
     time: 25,
     rate: 4.4,
     reviews: 23,
-    isLiked: false,
+    isLiked: true,
   ),
   Food(
     name: "French Toast",

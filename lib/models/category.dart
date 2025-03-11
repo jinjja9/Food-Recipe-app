@@ -1,5 +1,5 @@
 const catgories = [
-  "All",
+  "Tất cả",
   "Món Việt",
   "Món Á",
   "Món Âu",
