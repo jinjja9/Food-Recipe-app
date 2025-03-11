@@ -16,6 +16,37 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     List<Food> favoriteFoods = foods.where((food) => food.isLiked).toList();
 
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: const Center(
+              child: Text(
+                "Món ăn yêu thích",
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            automaticallyImplyLeading: false,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -23,22 +54,23 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Center(
-                      child: Text(
-                        "Món ăn yêu thích",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    const Text(
+                      "Lọc món ăn",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.filter_list),
+                      onPressed: () {},
                     ),
                   ],
                 ),
-                const SizedBox(height: 30),
-                // Hiển thị các món ăn yêu thích
+                const Divider(),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -51,7 +83,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                     food: favoriteFoods[index],
                   ),
                   itemCount: favoriteFoods.length,
-                )
+                ),
               ],
             ),
           ),

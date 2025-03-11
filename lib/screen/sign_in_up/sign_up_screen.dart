@@ -1,3 +1,4 @@
+import 'package:app/screen/sign_in_up/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/color.dart';
@@ -77,7 +78,7 @@ class SignUpScreen extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SignUpScreen()));
+                              builder: (context) => const SignInScreen()));
                     },
                     child: const Text(
                       'Đăng nhập ngay',

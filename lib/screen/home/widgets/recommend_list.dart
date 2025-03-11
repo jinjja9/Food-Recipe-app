@@ -5,7 +5,7 @@ import '../recipe_screen.dart';
 import '../recommend_foods_screen.dart';
 
 class RecommendListList extends StatelessWidget {
-  final List<Food> foods; // Sửa từ 'Food food' thành 'List<Food> foods'
+  final List<Food> foods;
   const RecommendListList({super.key, required this.foods});
 
   @override

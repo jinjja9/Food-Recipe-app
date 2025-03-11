@@ -1,6 +1,8 @@
 import 'package:app/screen/sign_in_up/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
+import 'core/color.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -14,6 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
+        scaffoldBackgroundColor: kbackgroundColor,
       ),
       home: const WelcomeScreen(),
     );
