@@ -9,6 +9,8 @@ class VietNameFood extends Food {
     required super.rate,
     required super.reviews,
     required super.isLiked,
+    required super.author,
+    required super.avatarImage,
   });
 }
 
@@ -21,6 +23,8 @@ final List<VietNameFood> foodsVietNam = [
     rate: 4.4,
     reviews: 23,
     isLiked: false,
+    author: '',
+    avatarImage: '',
   ),
   VietNameFood(
     name: "Phở",
@@ -30,6 +34,8 @@ final List<VietNameFood> foodsVietNam = [
     rate: 4.4,
     reviews: 23,
     isLiked: true,
+    author: '',
+    avatarImage: '',
   ),
   VietNameFood(
     name: "bánh cuốn",
@@ -39,5 +45,7 @@ final List<VietNameFood> foodsVietNam = [
     rate: 4.2,
     reviews: 10,
     isLiked: false,
+    author: '',
+    avatarImage: '',
   ),
 ];

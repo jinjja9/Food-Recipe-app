@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../core/color.dart';
-import '../models/category.dart';
+import '../../core/color.dart';
+import '../../models/category.dart';
 
 class Categories extends StatelessWidget {
   const Categories(

@@ -1,6 +1,7 @@
 const catgories = [
-  "Tất cả",
   "Món Việt",
-  "Món Á",
+  "Món Hàn",
+  "Món Nhật",
+  "Món Trung",
   "Món Âu",
 ];

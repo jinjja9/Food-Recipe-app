@@ -1,7 +1,7 @@
 import 'package:app/models/vietnam_food.dart';
+import 'package:app/screen/home/categories.dart';
 import 'package:app/screen/home/widgets/home_appbar.dart';
 import 'package:app/screen/home/widgets/home_search_bar.dart';
-import 'package:app/widgets/categories.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/asian_food.dart';
@@ -17,17 +17,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String currentCat = 'Tất cả';
+  String currentCat = 'Món Việt';
   List<Food> selectedFoods = foods;
 
   void updateFoodList(String category) {
     setState(() {
       currentCat = category;
-      if (category == 'Tất cả') {
+      if (category == 'Món Âu') {
         selectedFoods = foods;
       } else if (category == 'Món Việt') {
         selectedFoods = foodsVietNam;
-      } else if (category == 'Món Á') {
+      } else if (category == 'Món Trung') {
         selectedFoods = foodsAsian;
       } else {
         selectedFoods = foodsEupore;

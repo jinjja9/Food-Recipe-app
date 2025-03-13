@@ -9,6 +9,8 @@ class EuporeFood extends Food {
     required super.rate,
     required super.reviews,
     required super.isLiked,
+    required super.author,
+    required super.avatarImage,
   });
 }
 
@@ -21,6 +23,8 @@ final List<EuporeFood> foodsEupore = [
     rate: 4.6,
     reviews: 90,
     isLiked: true,
+    author: '',
+    avatarImage: '',
   ),
   EuporeFood(
     name: "Dumplings",
@@ -30,6 +34,8 @@ final List<EuporeFood> foodsEupore = [
     rate: 4.0,
     reviews: 76,
     isLiked: false,
+    author: '',
+    avatarImage: '',
   ),
   EuporeFood(
     name: "Mexican Pizza",
@@ -39,6 +45,8 @@ final List<EuporeFood> foodsEupore = [
     rate: 4.4,
     reviews: 23,
     isLiked: false,
+    author: '',
+    avatarImage: '',
   ),
   EuporeFood(
     name: "French Toast",
@@ -48,5 +56,7 @@ final List<EuporeFood> foodsEupore = [
     rate: 4.6,
     reviews: 90,
     isLiked: true,
+    author: '',
+    avatarImage: '',
   ),
 ];

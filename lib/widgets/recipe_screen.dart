@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/color.dart';
-import '../../models/food.dart';
+import '../core/color.dart';
+import '../models/category.dart';
+import '../models/food.dart';
+import 'RatingDialog.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Food food;
-
   const RecipeScreen({super.key, required this.food});
 
   @override
@@ -15,6 +16,11 @@ class RecipeScreen extends StatefulWidget {
 
 class _RecipeScreenState extends State<RecipeScreen> {
   int currentNumber = 1;
+  String currentCat = 'Món Âu';
+
+  List<String> get categoriesToShow {
+    return catgories.where((category) => category != "Tất cả").toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +33,14 @@ class _RecipeScreenState extends State<RecipeScreen> {
             Expanded(
               flex: 6,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const RatingDialog(); // Hiển thị dialog
+                    },
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kprimaryColor,
                   foregroundColor: Colors.white,
@@ -171,7 +184,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   Text(
                     widget.food.name,
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -244,7 +257,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        "20 lượt thích", // Dữ liệu số lượt thích có thể thay đổi
+                        "20 lượt thích",
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
@@ -252,7 +265,70 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const Divider(
+                    color: Colors.grey,
+                    thickness: 0.5,
+                  ),
+
+                  //Dropdown
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Thể loại món ăn",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade300,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: DropdownButton<String>(
+                            isDense: true,
+                            value: currentCat,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            dropdownColor: Colors.orange.shade300,
+                            underline: Container(),
+                            icon: const Icon(Icons.arrow_drop_down,
+                                color: Colors.white),
+                            onChanged: (String? newCategory) {
+                              setState(() {
+                                currentCat = newCategory ?? currentCat;
+                              });
+                            },
+                            items: categoriesToShow
+                                .map<DropdownMenuItem<String>>(
+                                    (String category) {
+                              return DropdownMenuItem<String>(
+                                value: category,
+                                child: Text(category,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Divider(
+                    color: Colors.grey,
+                    thickness: 0.5,
+                  ),
+
                   const Text(
                     'Giới thiệu',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -263,6 +339,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 20),
+                  const Divider(
+                    color: Colors.grey,
+                    thickness: 0.5,
+                  ),
                   const Text(
                     'Thành phần',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -279,6 +359,10 @@ Sốt: Mayonnaise, sốt cà chua, mù tạt, sốt BBQ hoặc sốt đặc bi�
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 20),
+                  const Divider(
+                    color: Colors.grey,
+                    thickness: 0.5,
+                  ),
                   const Text(
                     'Hướng dẫn',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

@@ -15,96 +15,99 @@ class SignInScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: screenHeight * 0.1,
-              ),
-              const Text(
-                'Đăng nhập\ntài khoản của bạn',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 35,
-                  color: backgroundButton,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: screenHeight * 0.1,
                 ),
-              ),
-              SizedBox(height: screenHeight * 0.05),
-              const TextField(
-                decoration: InputDecoration(
-                    labelText: 'Email', border: OutlineInputBorder()),
-              ),
-              const SizedBox(height: 10),
-              const TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Mật khẩu',
-                  border: OutlineInputBorder(),
+                const Text(
+                  'Đăng nhập\ntài khoản của bạn',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 35,
+                    color: backgroundButton,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Checkbox(value: false, onChanged: (bool? value) {}),
-                      const Text('Ghi nhớ đăng nhập'),
-                    ],
+                SizedBox(height: screenHeight * 0.05),
+                const TextField(
+                  decoration: InputDecoration(
+                      labelText: 'Email', border: OutlineInputBorder()),
+                ),
+                const SizedBox(height: 10),
+                const TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Mật khẩu',
+                    border: OutlineInputBorder(),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const ForgotPasswordScreen()));
-                    },
-                    child: const Text('Quên mật khẩu?'),
-                  ),
-                ],
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const MainScreen()));
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: backgroundButton,
-                    padding:
-                        EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-                    minimumSize: Size(double.infinity, screenHeight * 0.02),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15))),
-                child: const Text('Đăng nhập',
-                    style: TextStyle(color: Colors.white)),
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Chưa có tài khoản?'),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SignUpScreen()));
-                    },
-                    child: const Text(
-                      'Đăng ký ngay',
-                      style: TextStyle(
-                          color: backgroundButton, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Checkbox(value: false, onChanged: (bool? value) {}),
+                        const Text('Ghi nhớ đăng nhập'),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const ForgotPasswordScreen()));
+                      },
+                      child: const Text('Quên mật khẩu?'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: screenHeight * 0.02),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MainScreen()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: backgroundButton,
+                      padding:
+                          EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                      minimumSize: Size(double.infinity, screenHeight * 0.02),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15))),
+                  child: const Text('Đăng nhập',
+                      style: TextStyle(color: Colors.white)),
+                ),
+                SizedBox(height: screenHeight * 0.02),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Chưa có tài khoản?'),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpScreen()));
+                      },
+                      child: const Text(
+                        'Đăng ký ngay',
+                        style: TextStyle(
+                            color: backgroundButton,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

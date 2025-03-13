@@ -1,5 +1,7 @@
 class Food {
   String name;
+  String author;
+  String avatarImage;
   String image;
   double cal;
   double time;
@@ -9,6 +11,8 @@ class Food {
 
   Food({
     required this.name,
+    required this.author,
+    required this.avatarImage,
     required this.image,
     required this.cal,
     required this.time,
@@ -21,6 +25,8 @@ class Food {
 final List<Food> foods = [
   Food(
     name: "Spicy Ramen Noodles",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/ramen.jpg",
     cal: 120,
     time: 15,
@@ -30,6 +36,8 @@ final List<Food> foods = [
   ),
   Food(
     name: "Beef Steak",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/beaf-steak.jpg",
     cal: 140,
     time: 25,
@@ -39,6 +47,8 @@ final List<Food> foods = [
   ),
   Food(
     name: "Butter Chicken",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/butter-chicken.jpg",
     cal: 130,
     time: 18,
@@ -48,6 +58,8 @@ final List<Food> foods = [
   ),
   Food(
     name: "French Toast",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/french-toast.jpg",
     cal: 110,
     time: 16,
@@ -57,6 +69,8 @@ final List<Food> foods = [
   ),
   Food(
     name: "Dumplings",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/dumplings.jpg",
     cal: 150,
     time: 30,
@@ -66,6 +80,8 @@ final List<Food> foods = [
   ),
   Food(
     name: "Mexican Pizza",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/mexican-pizza.jpg",
     cal: 140,
     time: 25,
@@ -75,6 +91,8 @@ final List<Food> foods = [
   ),
   Food(
     name: "French Toast",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/french-toast.jpg",
     cal: 110,
     time: 16,
@@ -84,6 +102,8 @@ final List<Food> foods = [
   ),
   Food(
     name: "Dumplings",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/dumplings.jpg",
     cal: 150,
     time: 30,
@@ -93,6 +113,8 @@ final List<Food> foods = [
   ),
   Food(
     name: "Mexican Pizza",
+    author: "jacob_w",
+    avatarImage: "assets/images/avatar1.png",
     image: "assets/images/mexican-pizza.jpg",
     cal: 140,
     time: 25,
