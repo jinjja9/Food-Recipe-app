@@ -1,3 +1,4 @@
+import 'package:app/widgets/AddRecipeScreen.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/food.dart';
@@ -53,7 +54,12 @@ class ExploreScreen extends StatelessWidget {
                     color: Colors.orange,
                     size: 40,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AddRecipeScreen()));
+                  },
                 ),
               ],
             ),
@@ -67,11 +73,10 @@ class ExploreScreen extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      RecipeScreen(food: food), // Điều hướng tới RecipeScreen
+                  builder: (context) => RecipeScreen(food: food),
                 ),
               ),
-              child: PostCard(food: food), // Giữ nguyên PostCard
+              child: PostCard(food: food),
             );
           }).toList(),
         ),
