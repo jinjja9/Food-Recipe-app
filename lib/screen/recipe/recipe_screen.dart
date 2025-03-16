@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../core/color.dart';
-import '../models/category.dart';
-import '../models/food.dart';
-import 'RatingDialog.dart';
+import '../../core/color.dart';
+import '../../models/category.dart';
+import '../../models/food.dart';
+import 'rating_dialog.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Food food;

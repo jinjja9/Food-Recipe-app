@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../explore/ExploreScreen.dart';
 import '../favorite/FavoriteScreen.dart';
+import '../profile/ProfileScreen.dart';
 import 'home_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
     HomeScreen(),
     FavoriteScreen(),
     ExploreScreen(),
-    Scaffold(),
+    ProfileScreen(),
   ];
 
   @override

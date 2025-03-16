@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/color.dart';
+
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
 
@@ -32,7 +34,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         preferredSize: const Size.fromHeight(70.0),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white, // Màu nền trắng cho AppBar
+            color: Colors.white,
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
@@ -43,17 +45,15 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
             ],
           ),
           child: AppBar(
-            backgroundColor: Colors.white, // Màu nền trắng cho AppBar
-            elevation: 0, // Bỏ shadow mặc định của AppBar
+            backgroundColor: Colors.white,
+            elevation: 0,
             automaticallyImplyLeading: false,
             title: Row(
               children: [
-                // Icon "back" ở góc trái với màu trắng
                 IconButton(
-                  icon: const Icon(Icons.arrow_back,
-                      color: Colors.black), // Đổi màu trắng cho icon back
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
                   onPressed: () {
-                    Navigator.pop(context); // Quay lại màn hình trước
+                    Navigator.pop(context);
                   },
                 ),
                 const Expanded(
@@ -63,7 +63,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black, // Màu chữ đen
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -71,20 +71,17 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 IconButton(
                   icon: Icon(
                     Icons.check,
-                    color: Colors.orange[400], // Màu cho icon
+                    color: Colors.orange[400],
                     size: 40,
                   ),
                   onPressed: () {
-                    // Logic để lưu công thức, chẳng hạn như thêm vào danh sách hoặc gửi lên server
                     if (nameController.text.isNotEmpty &&
                         descriptionController.text.isNotEmpty) {
-                      // Giả sử công thức đã được lưu thành công
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text('Công thức đã được thêm thành công')),
                       );
                     } else {
-                      // Hiển thị thông báo lỗi nếu thiếu thông tin
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text('Vui lòng nhập đầy đủ thông tin')),
@@ -105,7 +102,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
             children: [
               const Text(
                 'Tên món ăn:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               TextField(
                 controller: nameController,
@@ -117,7 +114,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Thể loại món ăn:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               DropdownButton<String>(
                 value: selectedCategory,
@@ -136,36 +133,33 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 hint: const Text('Chọn thể loại món ăn'),
               ),
               const SizedBox(height: 20),
-              // Thêm mục Calo và Thời gian
               const Text(
                 'Calo và Thời gian:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  // Ô nhập Calo
                   Expanded(
                     child: TextField(
                       controller: caloController,
                       decoration: const InputDecoration(
                         labelText: 'Calo',
                         border: OutlineInputBorder(),
-                        fillColor: Colors.white, // Màu nền trắng
+                        fillColor: Colors.white,
                         filled: true,
                       ),
                       keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  // Ô nhập Thời gian
                   Expanded(
                     child: TextField(
                       controller: timeController,
                       decoration: const InputDecoration(
                         labelText: 'Thời gian (phút)',
                         border: OutlineInputBorder(),
-                        fillColor: Colors.white, // Màu nền trắng
+                        fillColor: Colors.white,
                         filled: true,
                       ),
                       keyboardType: TextInputType.number,
@@ -176,7 +170,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Giới thiệu:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               TextField(
                 controller: descriptionController,
@@ -189,7 +183,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Thành phần:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               TextField(
                 controller: ingredientsController,
@@ -202,7 +196,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
               const SizedBox(height: 20),
               const Text(
                 'Hướng dẫn:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               TextField(
                 controller: instructionsController,
@@ -213,8 +207,6 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Khung trống cho ảnh
               const Text(
                 'Thêm ảnh món ăn:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -235,16 +227,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Nút chọn ảnh
               ElevatedButton.icon(
-                onPressed: () {
-                  // Chức năng thêm ảnh sẽ được thêm sau
-                },
-                icon: const Icon(Icons.add_a_photo), // Icon thêm ảnh
+                onPressed: () {},
+                icon: const Icon(Icons.add_a_photo),
                 label: const Text('Thêm ảnh món ăn'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: kprimaryColor,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   minimumSize: const Size(double.infinity, 50),
                 ),

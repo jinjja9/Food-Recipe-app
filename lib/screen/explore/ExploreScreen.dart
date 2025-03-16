@@ -1,8 +1,8 @@
-import 'package:app/widgets/AddRecipeScreen.dart';
+import 'package:app/screen/recipe/add_recipe_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/food.dart';
-import '../../widgets/recipe_screen.dart';
+import '../recipe/recipe_screen.dart';
 import 'PostCard.dart';
 
 class ExploreScreen extends StatelessWidget {

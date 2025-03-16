@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/food.dart';
-import '../../../widgets/recipe_screen.dart';
+import '../../recipe/recipe_screen.dart';
 import '../recommend_foods_screen.dart';
 
 class RecommendListList extends StatelessWidget {

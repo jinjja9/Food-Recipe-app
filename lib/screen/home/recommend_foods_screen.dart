@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/food.dart';
-import '../../widgets/food_card.dart';
+import '../recipe/food_card.dart';
 
 class QuickFoodsScreen extends StatefulWidget {
   const QuickFoodsScreen({super.key});
