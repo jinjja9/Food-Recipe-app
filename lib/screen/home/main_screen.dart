@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 import '../explore/ExploreScreen.dart';
 import '../favorite/FavoriteScreen.dart';
@@ -24,94 +25,33 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        height: 70,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () => setState(() {
-                currentTab = 0;
-              }),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.home,
-                    color: currentTab == 0 ? Colors.indigo[400] : Colors.grey,
-                  ),
-                  Text(
-                    "Trang chủ",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: currentTab == 0 ? Colors.indigo[400] : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () => setState(() {
-                currentTab = 1;
-              }),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.favorite,
-                    color: currentTab == 1 ? Colors.indigo[400] : Colors.grey,
-                  ),
-                  Text(
-                    "Yêu thích",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: currentTab == 1 ? Colors.indigo[400] : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () => setState(() {
-                currentTab = 2;
-              }),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.explore,
-                    color: currentTab == 2 ? Colors.indigo[400] : Colors.grey,
-                  ),
-                  Text(
-                    "Khám phá",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: currentTab == 2 ? Colors.indigo[400] : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () => setState(() {
-                currentTab = 3;
-              }),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.settings,
-                    color: currentTab == 3 ? Colors.indigo[400] : Colors.grey,
-                  ),
-                  Text(
-                    "Cá nhân",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: currentTab == 3 ? Colors.indigo[400] : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      bottomNavigationBar: SalomonBottomBar(
+        currentIndex: currentTab,
+        onTap: (i) => setState(() {
+          currentTab = i;
+        }),
+        items: [
+          SalomonBottomBarItem(
+            icon: Icon(Icons.home),
+            title: Text("Trang chủ"),
+            selectedColor: Colors.indigo[400],
+          ),
+          SalomonBottomBarItem(
+            icon: Icon(Icons.favorite),
+            title: Text("Yêu thích"),
+            selectedColor: Colors.indigo[400],
+          ),
+          SalomonBottomBarItem(
+            icon: Icon(Icons.explore),
+            title: Text("Khám phá"),
+            selectedColor: Colors.indigo[400],
+          ),
+          SalomonBottomBarItem(
+            icon: Icon(Icons.settings),
+            title: Text("Cá nhân"),
+            selectedColor: Colors.indigo[400],
+          ),
+        ],
       ),
       body: screens[currentTab],
     );

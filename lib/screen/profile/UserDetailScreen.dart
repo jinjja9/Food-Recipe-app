@@ -1,14 +1,12 @@
-import 'package:app/screen/sign_in_up/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/color.dart';
 import '../../models/food.dart';
 import '../recipe/recipe_screen.dart';
 import 'PersonalFoodCard.dart';
 import 'UserListScreen.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class UserDetailScreen extends StatelessWidget {
+  const UserDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +28,11 @@ class ProfileScreen extends StatelessWidget {
           child: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back_ios)),
             title: const Center(
               child: Text(
                 "Hồ Sơ",
@@ -78,48 +81,9 @@ class ProfileScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: kprimaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text("Chỉnh sửa thông tin"),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignInScreen(),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: kprimaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text("Đăng xuất"),
-                          ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                // Row with Expanded to make the button same size
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -133,13 +97,13 @@ class ProfileScreen extends StatelessWidget {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kprimaryColor,
+                          backgroundColor: Colors.orange[800],
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text("Danh sách người dùng"),
+                        child: const Text("Xóa tài khoản người dùng"),
                       ),
                     ),
                   ],
@@ -150,13 +114,20 @@ class ProfileScreen extends StatelessWidget {
                   color: Colors.grey,
                 ),
                 const SizedBox(height: 10),
-                // "Danh sách món ăn của tôi"
-                const Text(
-                  "Danh sách món ăn của tôi",
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      "Danh sách món ăn của Jacob_w",
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 10),
-                // Grid for displaying the foods
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -165,23 +136,21 @@ class ProfileScreen extends StatelessWidget {
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                   ),
-                  itemCount: foods
-                      .length, // Sử dụng số lượng món ăn trong danh sách foods
+                  itemCount: foods.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        // Khi nhấn vào card, chuyển sang màn hình RecipeScreen
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => RecipeScreen(
-                              food: foods[index], // Truyền dữ liệu món ăn
+                              food: foods[index],
                             ),
                           ),
                         );
                       },
                       child: PersonalFoodCard(
-                        food: foods[index], // Gọi widget PersonalFoodCard
+                        food: foods[index],
                       ),
                     );
                   },
