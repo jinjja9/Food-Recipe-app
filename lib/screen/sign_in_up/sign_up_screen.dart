@@ -20,9 +20,7 @@ class SignUpScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: screenHeight * 0.1,
-                ),
+                SizedBox(height: screenHeight * 0.1),
                 const Text(
                   'Đăng ký\ntài khoản của bạn',
                   style: TextStyle(
@@ -34,13 +32,18 @@ class SignUpScreen extends StatelessWidget {
                 SizedBox(height: screenHeight * 0.05),
                 const TextField(
                   decoration: InputDecoration(
-                      labelText: 'Tên người dùng',
-                      border: OutlineInputBorder()),
+                    labelText: 'Tên người dùng',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person, color: kprimaryColor),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 const TextField(
                   decoration: InputDecoration(
-                      labelText: 'Email', border: OutlineInputBorder()),
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.email, color: kprimaryColor),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 const TextField(
@@ -48,6 +51,7 @@ class SignUpScreen extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Mật khẩu',
                     border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock, color: kprimaryColor),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -56,20 +60,25 @@ class SignUpScreen extends StatelessWidget {
                   decoration: InputDecoration(
                     labelText: 'Xác nhận mật khẩu',
                     border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock_outline, color: kprimaryColor),
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.04),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: backgroundButton,
-                      padding:
-                          EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-                      minimumSize: Size(double.infinity, screenHeight * 0.02),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15))),
-                  child: const Text('Đăng ký',
-                      style: TextStyle(color: Colors.white)),
+                    backgroundColor: backgroundButton,
+                    padding:
+                        EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                    minimumSize: Size(double.infinity, screenHeight * 0.02),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: const Text(
+                    'Đăng ký',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 Row(
@@ -79,15 +88,17 @@ class SignUpScreen extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignInScreen()));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignInScreen()),
+                        );
                       },
                       child: const Text(
                         'Đăng nhập ngay',
                         style: TextStyle(
-                            color: backgroundButton,
-                            fontWeight: FontWeight.bold),
+                          color: backgroundButton,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],

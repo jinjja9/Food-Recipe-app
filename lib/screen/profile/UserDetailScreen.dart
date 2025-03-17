@@ -29,10 +29,15 @@ class UserDetailScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0,
             leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.arrow_back_ios)),
+              padding: const EdgeInsets.only(left: 16),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                size: 30,
+              ),
+            ),
             title: const Center(
               child: Text(
                 "Hồ Sơ",
@@ -43,6 +48,12 @@ class UserDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
+            actions: [
+              Container(
+                margin: const EdgeInsets.only(left: 16.0),
+                width: 30,
+              ),
+            ],
             automaticallyImplyLeading: false,
           ),
         ),

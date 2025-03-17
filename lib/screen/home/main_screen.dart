@@ -17,43 +17,59 @@ class _MainScreenState extends State<MainScreen> {
   int currentTab = 0;
   List screens = const [
     HomeScreen(),
-    FavoriteScreen(),
     ExploreScreen(),
+    FavoriteScreen(),
     ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: SalomonBottomBar(
-        currentIndex: currentTab,
-        onTap: (i) => setState(() {
-          currentTab = i;
-        }),
-        items: [
-          SalomonBottomBarItem(
-            icon: Icon(Icons.home),
-            title: Text("Trang chủ"),
-            selectedColor: Colors.indigo[400],
-          ),
-          SalomonBottomBarItem(
-            icon: Icon(Icons.favorite),
-            title: Text("Yêu thích"),
-            selectedColor: Colors.indigo[400],
-          ),
-          SalomonBottomBarItem(
-            icon: Icon(Icons.explore),
-            title: Text("Khám phá"),
-            selectedColor: Colors.indigo[400],
-          ),
-          SalomonBottomBarItem(
-            icon: Icon(Icons.settings),
-            title: Text("Cá nhân"),
-            selectedColor: Colors.indigo[400],
-          ),
-        ],
-      ),
       body: screens[currentTab],
+      bottomNavigationBar: Container(
+        height: 75,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 3,
+            ),
+          ],
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          child: SalomonBottomBar(
+            currentIndex: currentTab,
+            onTap: (i) => setState(() => currentTab = i),
+            backgroundColor: Colors.white,
+            items: [
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.home_rounded, size: 28),
+                title: const Text("Trang chủ", style: TextStyle(fontSize: 14)),
+                selectedColor: Colors.indigo[400],
+              ),
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.explore_rounded, size: 28),
+                title: const Text("Khám phá", style: TextStyle(fontSize: 14)),
+                selectedColor: Colors.orangeAccent,
+              ),
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.favorite_rounded, size: 28),
+                title: const Text("Yêu thích", style: TextStyle(fontSize: 14)),
+                selectedColor: Colors.pinkAccent,
+              ),
+              SalomonBottomBarItem(
+                icon: const Icon(Icons.person_rounded, size: 28),
+                title: const Text("Cá nhân", style: TextStyle(fontSize: 14)),
+                selectedColor: Colors.teal,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

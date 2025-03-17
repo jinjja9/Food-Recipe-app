@@ -20,30 +20,44 @@ class SignInScreen extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  height: screenHeight * 0.1,
-                ),
+                SizedBox(height: screenHeight * 0.1),
                 const Text(
-                  'Đăng nhập\ntài khoản của bạn',
+                  'Đăng nhập',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 35,
                     color: backgroundButton,
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.05),
-                const TextField(
-                  decoration: InputDecoration(
-                      labelText: 'Email', border: OutlineInputBorder()),
-                ),
                 const SizedBox(height: 10),
-                const TextField(
+                const Text(
+                  'Tài khoản của bạn',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black54,
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.05),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: const Icon(Icons.email, color: kprimaryColor),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: 'Mật khẩu',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    prefixIcon: const Icon(Icons.lock, color: kprimaryColor),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -59,32 +73,42 @@ class SignInScreen extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const ForgotPasswordScreen()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordScreen(),
+                          ),
+                        );
                       },
                       child: const Text('Quên mật khẩu?'),
                     ),
                   ],
                 ),
-                SizedBox(height: screenHeight * 0.02),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
+                SizedBox(height: screenHeight * 0.04),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const MainScreen()));
-                  },
-                  style: ElevatedButton.styleFrom(
+                          builder: (context) => const MainScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
                       backgroundColor: backgroundButton,
-                      padding:
-                          EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-                      minimumSize: Size(double.infinity, screenHeight * 0.02),
+                      foregroundColor: Colors.white,
+                      elevation: 5,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15))),
-                  child: const Text('Đăng nhập',
-                      style: TextStyle(color: Colors.white)),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    child: const Text(
+                      'Đăng nhập',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 Row(
@@ -94,15 +118,18 @@ class SignInScreen extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignUpScreen()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignUpScreen(),
+                          ),
+                        );
                       },
                       child: const Text(
                         'Đăng ký ngay',
                         style: TextStyle(
-                            color: backgroundButton,
-                            fontWeight: FontWeight.bold),
+                          color: backgroundButton,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],

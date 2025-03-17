@@ -19,19 +19,17 @@ class PersonalFoodCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Ảnh món ăn
             Image.asset(
               food.image,
               fit: BoxFit.cover,
             ),
-            // Lớp phủ đằng dưới tên món ăn
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: Container(
                 padding: const EdgeInsets.all(8.0),
-                color: Colors.black.withOpacity(0.6), // Lớp nền mờ
+                color: Colors.black.withOpacity(0.6),
                 child: Text(
                   food.name,
                   style: const TextStyle(

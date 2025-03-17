@@ -1,3 +1,4 @@
+import 'package:app/screen/profile/EditProfileScreen.dart';
 import 'package:app/screen/sign_in_up/sign_in_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -82,7 +83,15 @@ class ProfileScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const EditProfileScreen(),
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: kprimaryColor,
                               foregroundColor: Colors.white,

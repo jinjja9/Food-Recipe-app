@@ -17,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String currentCat = 'Món Việt';
+  String currentCat = 'Món Âu';
   List<Food> selectedFoods = foods;
 
   void updateFoodList(String category) {

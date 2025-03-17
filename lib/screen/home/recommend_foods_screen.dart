@@ -14,6 +14,52 @@ class _QuickFoodsScreenState extends State<QuickFoodsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: AppBar(
+            leading: IconButton(
+              padding: const EdgeInsets.only(left: 16),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                size: 30,
+              ),
+            ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: const Center(
+              child: Text(
+                "Danh sách món ăn",
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            actions: [
+              Container(
+                margin: const EdgeInsets.only(left: 16.0),
+                width: 30,
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -21,36 +67,6 @@ class _QuickFoodsScreenState extends State<QuickFoodsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        fixedSize: const Size(55, 55),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      color: Colors.black,
-                      icon: const Icon(Icons.arrow_back_ios_new),
-                    ),
-                    const Center(
-                      child: Text(
-                        "Danh sách món ăn",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 55),
-                  ],
-                ),
-                const SizedBox(height: 30),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -63,7 +79,7 @@ class _QuickFoodsScreenState extends State<QuickFoodsScreen> {
                     food: foods[index],
                   ),
                   itemCount: foods.length,
-                )
+                ),
               ],
             ),
           ),

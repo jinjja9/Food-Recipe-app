@@ -47,10 +47,13 @@ class UserListScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0,
             leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.arrow_back_ios)),
+              padding: const EdgeInsets.only(left: 16),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back_ios),
+              iconSize: 30,
+            ),
             title: const Center(
               child: Text(
                 "Danh sách người dùng",
@@ -61,7 +64,11 @@ class UserListScreen extends StatelessWidget {
                 ),
               ),
             ),
-            automaticallyImplyLeading: false,
+            actions: [
+              Container(
+                width: 30,
+              ),
+            ],
           ),
         ),
       ),

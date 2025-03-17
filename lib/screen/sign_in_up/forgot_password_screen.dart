@@ -20,33 +20,40 @@ class ForgotPasswordScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: screenHeight * 0.12),
-                  // Tiêu đề
+                  SizedBox(height: screenHeight * 0.1),
                   const Text(
-                    'Chúng tôi sẽ giúp\nbạn lấy lại mật khẩu',
+                    'Quên mật khẩu',
                     style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: backgroundButton),
+                      fontSize: 35,
+                      fontWeight: FontWeight.bold,
+                      color: backgroundButton,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.03),
+                  const Text(
+                    'Vui lòng nhập mật khẩu mới của bạn bên dưới.',
+                    style: TextStyle(fontSize: 16),
                   ),
                   SizedBox(height: screenHeight * 0.05),
-                  // Ô nhập "Mật khẩu mới"
                   const TextField(
+                    obscureText: true,
                     decoration: InputDecoration(
-                        labelText: 'Mật khẩu mới',
-                        border: OutlineInputBorder()),
+                      labelText: 'Mật khẩu mới',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock, color: kprimaryColor),
+                    ),
                   ),
                   const SizedBox(height: 10),
-                  // Ô nhập "Xác nhận mật khẩu"
                   const TextField(
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Xác nhận mật khẩu',
                       border: OutlineInputBorder(),
+                      prefixIcon:
+                          Icon(Icons.lock_outline, color: kprimaryColor),
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.04),
-                  // Nút "Xác nhận"
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
@@ -73,7 +80,8 @@ class ForgotPasswordScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: const Icon(Icons.arrow_back, size: 28),
+                icon:
+                    const Icon(Icons.arrow_back, size: 28, color: Colors.black),
               ),
             ),
           ],

@@ -17,8 +17,19 @@ class FoodCard extends StatelessWidget {
           builder: (context) => RecipeScreen(food: food),
         ),
       ),
-      child: SizedBox(
-        width: double.infinity,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 5,
+              spreadRadius: 1,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Stack(
           children: [
             Column(
@@ -28,74 +39,69 @@ class FoodCard extends StatelessWidget {
                   width: double.infinity,
                   height: 100,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                    ),
                     image: DecorationImage(
                       image: AssetImage(food.image),
                       fit: BoxFit.fill,
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  food.name,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                const SizedBox(height: 5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    food.name,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.flash_on_rounded,
-                      size: 18,
-                      color: Colors.grey,
-                    ),
-                    Text(
-                      "${food.cal} Cal",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+                const SizedBox(height: 5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.flash_on_rounded,
+                          size: 18, color: Colors.grey),
+                      Text(
+                        "${food.cal} Cal",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
-                    ),
-                    const Text(
-                      " · ",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    const Icon(
-                      Icons.timelapse,
-                      size: 18,
-                      color: Colors.grey,
-                    ),
-                    Text(
-                      "${food.time} Min",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
+                      const Text(" · ", style: TextStyle(color: Colors.grey)),
+                      const Icon(Icons.timelapse, size: 18, color: Colors.grey),
+                      Text(
+                        "${food.time} Min",
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.yellow.shade700, size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      "${food.rate}/5",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.yellow.shade700, size: 20),
+                      const SizedBox(width: 5),
+                      Text(
+                        "${food.rate}/5",
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.grey.shade600),
                       ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      "(${food.reviews} Reviews)",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade400,
+                      const SizedBox(width: 5),
+                      Text(
+                        "(${food.reviews} Reviews)",
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.grey.shade400),
                       ),
-                    )
-                  ],
-                )
+                    ],
+                  ),
+                ),
               ],
             ),
             Positioned(
@@ -112,13 +118,10 @@ class FoodCard extends StatelessWidget {
                 ),
                 iconSize: 20,
                 icon: food.isLiked
-                    ? const Icon(
-                        Icons.favorite,
-                        color: Colors.red,
-                      )
+                    ? const Icon(Icons.favorite, color: Colors.red)
                     : const Icon(Icons.favorite),
               ),
-            )
+            ),
           ],
         ),
       ),
