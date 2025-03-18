@@ -95,6 +95,18 @@ class _RecipeScreenState extends State<RecipeScreen> {
                           ),
                           fixedSize: const Size(50, 50),
                         ),
+                        icon: const Icon(Icons.delete),
+                      ),
+                      const SizedBox(width: 10),
+                      IconButton(
+                        onPressed: () {},
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          fixedSize: const Size(50, 50),
+                        ),
                         icon: const Icon(Icons.favorite),
                       ),
                     ],
