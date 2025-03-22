@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../../models/food.dart';
+import '../../../models/food.dart';
 import '../../widgets/food_card.dart';
 
-class FavoriteScreen extends StatefulWidget {
-  const FavoriteScreen({super.key});
+class PopularFoodScreen extends StatelessWidget {
+  final List<Food> popularFoods;
 
-  @override
-  State<FavoriteScreen> createState() => _FavoriteScreenState();
-}
+  const PopularFoodScreen({super.key, required this.popularFoods});
 
-class _FavoriteScreenState extends State<FavoriteScreen> {
   @override
   Widget build(BuildContext context) {
-    List<Food> favoriteFoods = foods.where((food) => food.isLiked).toList();
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
@@ -33,17 +28,15 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           child: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
-            title: const Center(
-              child: Text(
-                "Món ăn yêu thích",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+            title: const Text(
+              "Món ăn phổ biến",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
-            automaticallyImplyLeading: false,
+            automaticallyImplyLeading: true,
           ),
         ),
       ),
@@ -61,11 +54,9 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    return FoodCard(
-                      food: favoriteFoods[index],
-                    );
+                    return FoodCard(food: popularFoods[index]);
                   },
-                  childCount: favoriteFoods.length,
+                  childCount: popularFoods.length,
                 ),
               ),
             ),

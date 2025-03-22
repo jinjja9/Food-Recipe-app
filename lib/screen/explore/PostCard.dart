@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/color.dart';
 import '../../models/food.dart';
 
 class PostCard extends StatelessWidget {
@@ -18,6 +19,7 @@ class PostCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       elevation: 5,
+      color: kbackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

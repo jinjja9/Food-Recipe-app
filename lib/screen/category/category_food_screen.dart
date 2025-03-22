@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import '../../models/food.dart';
 import '../../widgets/food_card.dart';
 
-class FavoriteScreen extends StatefulWidget {
-  const FavoriteScreen({super.key});
+class CategoryFoodScreen extends StatelessWidget {
+  final String category;
+  final List<Food> categoryFoods;
 
-  @override
-  State<FavoriteScreen> createState() => _FavoriteScreenState();
-}
+  const CategoryFoodScreen({
+    super.key,
+    required this.category,
+    required this.categoryFoods,
+  });
 
-class _FavoriteScreenState extends State<FavoriteScreen> {
   @override
   Widget build(BuildContext context) {
-    List<Food> favoriteFoods = foods.where((food) => food.isLiked).toList();
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
@@ -33,17 +33,15 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           child: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
-            title: const Center(
-              child: Text(
-                "Món ăn yêu thích",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+            title: Text(
+              category,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
-            automaticallyImplyLeading: false,
+            automaticallyImplyLeading: true,
           ),
         ),
       ),
@@ -62,10 +60,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return FoodCard(
-                      food: favoriteFoods[index],
+                      food: categoryFoods[index],
                     );
                   },
-                  childCount: favoriteFoods.length,
+                  childCount: categoryFoods.length,
                 ),
               ),
             ),

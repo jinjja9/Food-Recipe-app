@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/food.dart';
-import '../../recipe/recipe_screen.dart';
-import '../recommend_foods_screen.dart';
+import '../../models/food.dart';
+import '../recipe/recipe_screen.dart';
+import 'recommend_foods_screen.dart';
 
-class RecommendListList extends StatelessWidget {
+class RecommendList extends StatelessWidget {
   final List<Food> foods;
-  const RecommendListList({super.key, required this.foods});
+  const RecommendList({super.key, required this.foods});
 
   @override
   Widget build(BuildContext context) {
