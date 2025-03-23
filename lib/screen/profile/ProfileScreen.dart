@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../../core/color.dart';
 import '../../models/food.dart';
+import '../admin/UserListScreen.dart';
 import '../recipe/recipe_screen.dart';
 import 'PersonalFoodCard.dart';
-import 'UserListScreen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../models/food.dart';
+import '../profile/PersonalFoodCard.dart';
 import '../recipe/recipe_screen.dart';
-import 'PersonalFoodCard.dart';
 import 'UserListScreen.dart';
 
 class UserDetailScreen extends StatelessWidget {
