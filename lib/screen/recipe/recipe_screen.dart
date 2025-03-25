@@ -4,6 +4,7 @@ import '../../core/color.dart';
 import '../../models/category.dart';
 import '../../models/food.dart';
 import '../../widgets/rating_dialog.dart';
+import 'CommentsSection.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Food food;
@@ -435,6 +436,9 @@ class _RecipeScreenState extends State<RecipeScreen>
                       ],
                     ),
                   ),
+                  _buildSectionHeader('Bình luận'),
+                  const SizedBox(height: 12),
+                  CommentsSection(foodName: widget.food.name),
                 ],
               ),
             ),
