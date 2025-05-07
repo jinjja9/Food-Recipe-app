@@ -1,4 +1,5 @@
 import 'package:app/screen/sign_in_up/sign_in_screen.dart';
+import 'package:app/screen/sign_in_up/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -170,7 +171,14 @@ class WelcomeScreen extends StatelessWidget {
                               ],
                             ),
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignUpScreen(),
+                                  ),
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
                                 backgroundColor: Colors.transparent,
