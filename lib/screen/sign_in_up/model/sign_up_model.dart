@@ -22,4 +22,4 @@ class SignUpModel {
       'agreeToTerms': agreeToTerms,
     };
   }
-} 
+}

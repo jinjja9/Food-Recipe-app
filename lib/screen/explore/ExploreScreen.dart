@@ -1,9 +1,11 @@
 import 'package:app/screen/recipe/add_recipe_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/food.dart';
 import '../recipe/recipe_screen.dart';
 import 'PostCard.dart';
+import '../../models/category.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -13,16 +15,22 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  final List<String> categories = [
-    'Tất cả',
-    'Món Việt',
-    'Món Hàn',
-    'Món Nhật',
-    'Món Trung',
-    'Món Âu',
-  ];
-
+  List<Category> categories = [];
   String selectedCategory = 'Tất cả';
+
+  Future<void> fetchCategories() async {
+    final snapshot = await FirebaseFirestore.instance.collection('categories').get();
+    final fetched = snapshot.docs.map((doc) => Category.fromFirestore(doc.data(), doc.id)).toList();
+    setState(() {
+      categories = [Category(id: 'all', name: 'Tất cả', imageUrl: '')] + fetched;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,12 +82,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemBuilder: (context, index) {
                       final category = categories[index];
-                      final isSelected = category == selectedCategory;
+                      final isSelected = category.name == selectedCategory;
 
                       return GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedCategory = category;
+                            selectedCategory = category.name;
                           });
                         },
                         child: Container(
@@ -92,7 +100,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            category,
+                            category.name,
                             style: TextStyle(
                               color: isSelected ? Colors.white : Colors.black87,
                               fontWeight: isSelected

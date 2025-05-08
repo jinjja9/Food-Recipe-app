@@ -23,10 +23,6 @@ class _RecipeScreenState extends State<RecipeScreen>
   bool _showTitle = false;
   late TabController _tabController;
 
-  List<String> get categoriesToShow {
-    return catgories.where((category) => category != "Tất cả").toList();
-  }
-
   @override
   void initState() {
     super.initState();

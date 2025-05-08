@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+
 import '../model/sign_up_model.dart';
 
 class SignUpViewModel extends ChangeNotifier {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
-  
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+
   bool _obscureText1 = true;
   bool _obscureText2 = true;
   bool _agreeToTerms = false;
@@ -67,4 +69,4 @@ class SignUpViewModel extends ChangeNotifier {
     confirmPasswordController.dispose();
     super.dispose();
   }
-} 
+}

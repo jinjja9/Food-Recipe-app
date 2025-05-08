@@ -39,7 +39,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
       }
       emit(SignInFailure(errorMessage));
     } catch (e) {
-      emit(SignInFailure('Đã xảy ra lỗi không xác định'));
+      emit(SignInFailure('Đăng nhập thành công!'));
     }
   }
 }
