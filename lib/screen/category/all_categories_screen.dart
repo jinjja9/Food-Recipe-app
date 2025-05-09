@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/category.dart';
-
 class AllCategoriesScreen extends StatefulWidget {
   const AllCategoriesScreen({super.key});
 
@@ -11,10 +9,10 @@ class AllCategoriesScreen extends StatefulWidget {
 }
 
 class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
-  Future<List<Category>> fetchCategories() async {
+  Future<List<Map<String, dynamic>>> fetchCategories() async {
     final snapshot = await FirebaseFirestore.instance.collection('categories').get();
     return snapshot.docs
-        .map((doc) => Category.fromFirestore(doc.data(), doc.id))
+        .map((doc) => { ...doc.data(), 'id': doc.id })
         .toList();
   }
 
@@ -33,7 +31,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: FutureBuilder<List<Category>>(
+      body: FutureBuilder<List<Map<String, dynamic>>>(
         future: fetchCategories(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -63,7 +61,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
                       final category = categories[index];
                       return GestureDetector(
                         onTap: () {
-                          // TODO: Điều hướng đến màn CategoryFoodScreen với category.id hoặc category.name
+                          // TODO: Điều hướng đến màn CategoryFoodScreen với category['id'] hoặc category['name']
                         },
                         child: Card(
                           elevation: 5,
@@ -76,7 +74,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
                               fit: StackFit.expand,
                               children: [
                                 Image.network(
-                                  category.imageUrl,
+                                  category['imageUrl'],
                                   fit: BoxFit.cover,
                                 ),
                                 Positioned(
@@ -87,7 +85,7 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
                                     padding: const EdgeInsets.all(8.0),
                                     color: Colors.black.withOpacity(0.6),
                                     child: Text(
-                                      category.name,
+                                      category['name'],
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,

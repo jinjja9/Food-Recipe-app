@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/food.dart';
 import '../recipe/recipe_screen.dart';
 import 'PostCard.dart';
-import '../../models/category.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -15,21 +14,14 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  List<Category> categories = [];
-  String selectedCategory = 'Tất cả';
-
-  Future<void> fetchCategories() async {
-    final snapshot = await FirebaseFirestore.instance.collection('categories').get();
-    final fetched = snapshot.docs.map((doc) => Category.fromFirestore(doc.data(), doc.id)).toList();
-    setState(() {
-      categories = [Category(id: 'all', name: 'Tất cả', imageUrl: '')] + fetched;
-    });
+  Future<List<Food>> fetchFoods() async {
+    final snapshot = await FirebaseFirestore.instance.collection('foods').get();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
   }
 
   @override
   void initState() {
     super.initState();
-    fetchCategories();
   }
 
   @override
@@ -71,70 +63,42 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 ),
                 const SizedBox(width: 8),
               ],
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(50),
-                child: Container(
-                  height: 50,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categories.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      final isSelected = category.name == selectedCategory;
-
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = category.name;
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 6),
-                          decoration: BoxDecoration(
-                            color:
-                                isSelected ? Colors.orange : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            category.name,
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black87,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
             ),
-
             // Content
             SliverPadding(
               padding: const EdgeInsets.only(top: 8),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final food = foods[index];
-                    return GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RecipeScreen(food: food),
-                        ),
-                      ),
-                      child: PostCard(food: food),
+              sliver: FutureBuilder<List<Food>>(
+                future: fetchFoods(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SliverToBoxAdapter(
+                      child: Center(child: CircularProgressIndicator()),
                     );
-                  },
-                  childCount: foods.length,
-                ),
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const SliverToBoxAdapter(
+                      child: Center(child: Text('Không có món ăn nào')),
+                    );
+                  }
+                  final foods = snapshot.data!;
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final food = foods[index];
+                        return GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RecipeScreen(food: food),
+                            ),
+                          ),
+                          child: PostCard(food: food),
+                        );
+                      },
+                      childCount: foods.length,
+                    ),
+                  );
+                },
               ),
             ),
           ],

@@ -1,15 +1,13 @@
-import 'package:app/models/vietnam_food.dart';
 import 'package:app/screen/home/home_appbar.dart';
 import 'package:app/screen/home/home_search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../core/color.dart';
-import '../../models/asian_food.dart';
-import '../../models/eupore_food.dart';
 import '../../models/food.dart';
 import '../../widgets/food_card.dart';
 import '../category/all_categories_screen.dart';
-import '../category/categories.dart';
+import '../../models/categories.dart';
 import '../category/category_food_screen.dart';
 import '../popular/popular_food_screen.dart';
 
@@ -22,7 +20,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentCat = 'Món Âu';
-  List<Food> selectedFoods = foods;
+
+  Future<List<Food>> fetchFoods() async {
+    final snapshot = await FirebaseFirestore.instance.collection('foods').get();
+    print('Số lượng món ăn lấy được: \\${snapshot.docs.length}');
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                         onPressed: () {
-                          // Điều hướng đến màn hình tất cả thể loại
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -88,29 +90,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   setState(() {
                     currentCat = category;
                   });
-
-                  // Điều hướng đến màn hình CategoryFoodScreen với món ăn cố định
-                  List<Food> categoryFoods = foods; // Giữ dữ liệu cố định
-                  if (category == 'Món Việt') {
-                    categoryFoods = foodsVietNam;
-                  } else if (category == 'Món Trung') {
-                    categoryFoods = foodsAsian;
-                  } else if (category == 'Món Nhật') {
-                    categoryFoods = foodsEupore;
-                  }
-
-                  // Chuyển đến màn hình CategoryFoodScreen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => CategoryFoodScreen(
-                        category: category,
-                        categoryFoods: categoryFoods,
+                        category: category, categoryFoods: [],
                       ),
                     ),
                   );
                 },
-                limit: 5, // Giới hạn hiển thị 5 thể loại
+                limit: 5,
               ),
               const SizedBox(height: 20),
               Row(
@@ -126,43 +115,51 @@ class _HomeScreenState extends State<HomeScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PopularFoodScreen(
-                                popularFoods:
-                                    foods, // Truyền tất cả món ăn phổ biến
-                              ),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Xem tất cả',
-                          style:
-                              TextStyle(color: backgroundButton, fontSize: 15),
-                        )),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PopularFoodScreen(popularFoods: [],),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Xem tất cả',
+                        style: TextStyle(color: backgroundButton, fontSize: 15),
+                      ),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              // Grid hiển thị 4 món ăn phổ biến, sử dụng dữ liệu cố định từ `foods`
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                  childAspectRatio:
-                      0.75, // Điều chỉnh tỷ lệ khung hình của card
-                ),
-                itemCount: selectedFoods.length > 4 ? 4 : selectedFoods.length,
-                // Giới hạn 4 món
-                itemBuilder: (context, index) {
-                  return FoodCard(food: selectedFoods[index]);
+              FutureBuilder<List<Food>>(
+                future: fetchFoods(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('Không có món ăn nào'));
+                  }
+                  final foods = snapshot.data!;
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 15,
+                      childAspectRatio: 0.75,
+                    ),
+                    itemCount: foods.length,
+                    itemBuilder: (context, index) {
+                      final food = foods[index];
+                      return FoodCard(food: food);
+                    },
+                  );
                 },
-              ),
+              )
+
             ],
           ),
         ),

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../core/color.dart';
-import '../../models/category.dart';
 import '../../models/food.dart';
 import '../../widgets/rating_dialog.dart';
-import 'CommentsSection.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Food food;
@@ -17,7 +16,7 @@ class RecipeScreen extends StatefulWidget {
 class _RecipeScreenState extends State<RecipeScreen>
     with SingleTickerProviderStateMixin {
   int currentNumber = 1;
-  String currentCat = 'Món Âu';
+  String? categoryName;
   bool isFavorite = false;
   final ScrollController _scrollController = ScrollController();
   bool _showTitle = false;
@@ -28,6 +27,23 @@ class _RecipeScreenState extends State<RecipeScreen>
     super.initState();
     _scrollController.addListener(_onScroll);
     _tabController = TabController(length: 2, vsync: this);
+    fetchCategoryName();
+  }
+
+  Future<void> fetchCategoryName() async {
+    if (widget.food.categoryId.isEmpty) {
+      setState(() {
+        categoryName = 'Chưa có thể loại';
+      });
+      return;
+    }
+    final doc = await FirebaseFirestore.instance.collection('categories').doc(widget.food.categoryId).get();
+    print('doc exists: ${doc.exists}');
+    print('doc data: ${doc.data()}');
+    setState(() {
+      categoryName = doc.data()?['name'] ?? "koco";
+    });
+    print('categoryId: ${widget.food.categoryId}');
   }
 
   @override
@@ -154,7 +170,7 @@ class _RecipeScreenState extends State<RecipeScreen>
                   width: double.infinity,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage(widget.food.image),
+                      image: NetworkImage(widget.food.image),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -222,7 +238,7 @@ class _RecipeScreenState extends State<RecipeScreen>
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          currentCat,
+                          categoryName ?? 'Đang tải...',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -247,24 +263,19 @@ class _RecipeScreenState extends State<RecipeScreen>
                       children: [
                         _buildStatItem(
                           icon: Icons.local_fire_department_rounded,
-                          value: "${widget.food.cal}",
+                          value: "${widget.food.calories}",
                           label: "Calo",
                           color: Colors.orange,
                         ),
                         _buildDivider(),
                         _buildStatItem(
                           icon: Icons.timer_rounded,
-                          value: "${widget.food.time}",
+                          value: "${widget.food.cooking_time}",
                           label: "Phút",
                           color: Colors.blue,
                         ),
                         _buildDivider(),
-                        _buildStatItem(
-                          icon: Icons.star_rounded,
-                          value: "${widget.food.rate}/5",
-                          label: "${widget.food.reviews} đánh giá",
-                          color: Colors.amber,
-                        ),
+                        _buildStatItem(icon: Icons.favorite, value: "${widget.food.likes}", label: "Lượt thích", color: Colors.red)
                       ],
                     ),
                   ),
@@ -288,23 +299,12 @@ class _RecipeScreenState extends State<RecipeScreen>
                     ),
                     child: Row(
                       children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: const DecorationImage(
-                              image: AssetImage('assets/images/avatar1.png'),
-                              fit: BoxFit.cover,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 10,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.white,
+                          child: CircleAvatar(
+                            radius: 58,
+                            backgroundImage: NetworkImage(widget.food.image),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -358,8 +358,8 @@ class _RecipeScreenState extends State<RecipeScreen>
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.grey.shade200),
                     ),
-                    child: const Text(
-                      'Hamburger là một món ăn phổ biến trên toàn thế giới, đặc biệt tại các nước phương Tây. Đây là một loại bánh sandwich gồm một miếng thịt kẹp giữa hai lát bánh mì tròn, thường được ăn kèm với rau xanh, phô mai, sốt và các loại gia vị khác.',
+                    child: Text(
+                      widget.food.description,
                       style: TextStyle(
                         fontSize: 15,
                         color: Colors.black87,
@@ -402,29 +402,13 @@ class _RecipeScreenState extends State<RecipeScreen>
                               // Ingredients tab
                               Padding(
                                 padding: const EdgeInsets.all(16),
-                                child: _buildIngredientsList([
-                                  'Bánh mì hamburger: 2 chiếc',
-                                  'Thịt bò xay: 200g',
-                                  'Phô mai cheddar: 2 lát',
-                                  'Xà lách: 2 lá',
-                                  'Cà chua: 1 quả, thái lát',
-                                  'Hành tây: 1/2 quả, thái lát',
-                                  'Dưa chuột muối: 4-5 lát',
-                                  'Sốt mayonnaise: 2 muỗng canh',
-                                  'Sốt cà chua: 1 muỗng canh',
-                                  'Muối, tiêu: vừa đủ',
-                                ]),
+                                child: _buildIngredientsList(widget.food.ingredients),
                               ),
 
                               // Steps tab
                               Padding(
                                 padding: const EdgeInsets.all(16),
-                                child: _buildInstructionsList([
-                                  'Chuẩn Bị Nguyên Liệu: Thái lát cà chua, dưa leo, hành tây và xà lách. Nướng hoặc làm nóng bánh mì để tăng độ giòn.',
-                                  'Chế Biến Thịt: Trộn thịt bò xay với muối, tiêu, và một ít bột tỏi (tùy chọn). Nặn thành miếng tròn dày khoảng 1,5 cm. Nướng trên bếp hoặc áp chảo với lửa vừa trong 3-4 phút mỗi mặt. Đặt phô mai lên thịt khi gần chín để phô mai tan chảy.',
-                                  'Lắp Ráp Hamburger: Phết sốt lên bánh mì. Đặt rau xanh, thịt, phô mai, và các nguyên liệu khác theo sở thích. Đậy nắp bánh lên và ấn nhẹ để kết dính.',
-                                  'Thưởng Thức: Dùng kèm khoai tây chiên hoặc salad để tăng thêm hương vị. Có thể kết hợp với nước ngọt hoặc bia để tận hưởng trọn vẹn hương vị của món ăn.',
-                                ]),
+                                child: _buildInstructionsList(widget.food.steps),
                               ),
                             ],
                           ),
@@ -432,9 +416,6 @@ class _RecipeScreenState extends State<RecipeScreen>
                       ],
                     ),
                   ),
-                  _buildSectionHeader('Bình luận'),
-                  const SizedBox(height: 12),
-                  CommentsSection(foodName: widget.food.name),
                 ],
               ),
             ),

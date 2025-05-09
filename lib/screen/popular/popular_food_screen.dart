@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../models/food.dart';
 import '../../widgets/food_card.dart';
 
 class PopularFoodScreen extends StatelessWidget {
-  final List<Food> popularFoods;
+  const PopularFoodScreen({super.key, required List popularFoods});
 
-  const PopularFoodScreen({super.key, required this.popularFoods});
+  Future<List<Food>> fetchPopularFoods() async {
+    final snapshot = await FirebaseFirestore.instance.collection('foods').get();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,26 +44,38 @@ class PopularFoodScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.75,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+        child: FutureBuilder<List<Food>>(
+          future: fetchPopularFoods(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('Không có món ăn nào'));
+            }
+            final foods = snapshot.data!;
+            return CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.all(16),
+                  sliver: SliverGrid(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return FoodCard(food: foods[index]);
+                      },
+                      childCount: foods.length,
+                    ),
+                  ),
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    return FoodCard(food: popularFoods[index]);
-                  },
-                  childCount: popularFoods.length,
-                ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );

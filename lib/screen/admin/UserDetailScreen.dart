@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/food.dart';
 import '../profile/PersonalFoodCard.dart';
@@ -139,32 +140,42 @@ class UserDetailScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                Expanded(
+                  child: FutureBuilder<List<Food>>(
+                    future: fetchFoods(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('Không có món ăn nào'));
+                      }
+                      final foods = snapshot.data!;
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: foods.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RecipeScreen(food: foods[index]),
+                                ),
+                              );
+                            },
+                            child: PersonalFoodCard(food: foods[index]),
+                          );
+                        },
+                      );
+                    },
                   ),
-                  itemCount: foods.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RecipeScreen(
-                              food: foods[index],
-                            ),
-                          ),
-                        );
-                      },
-                      child: PersonalFoodCard(
-                        food: foods[index],
-                      ),
-                    );
-                  },
                 ),
               ],
             ),
@@ -188,5 +199,10 @@ class UserDetailScreen extends StatelessWidget {
         Text(label),
       ],
     );
+  }
+
+  Future<List<Food>> fetchFoods() async {
+    final snapshot = await FirebaseFirestore.instance.collection('foods').get();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
   }
 }

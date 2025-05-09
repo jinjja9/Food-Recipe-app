@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../core/color.dart';
 import '../../models/food.dart';
@@ -30,7 +31,7 @@ class PostCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundImage: AssetImage(food.avatarImage),
+                  backgroundImage: NetworkImage(food.avatarImage),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -38,14 +39,14 @@ class PostCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        food.author,
+                        food.author ?? 'Unknown Author',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        "13/03/2025",
+                        "13/03/2024",
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],
@@ -70,11 +71,19 @@ class PostCard extends StatelessWidget {
                   topLeft: Radius.circular(4),
                   topRight: Radius.circular(4),
                 ),
-                child: Image.asset(
-                  food.image,
+                child: Image.network(
+                  food.image ?? 'https://via.placeholder.com/400x300',
                   width: double.infinity,
                   height: 220,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: double.infinity,
+                      height: 220,
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error_outline, size: 50),
+                    );
+                  },
                 ),
               ),
               Positioned(
@@ -93,10 +102,9 @@ class PostCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
-                    food.name,
+                    food.name ?? 'Untitled Recipe',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -126,7 +134,7 @@ class PostCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${food.isLiked ? 25 : 10}',
+                          '${food.likes ?? 0}',
                           style: TextStyle(
                             fontSize: 14,
                             color: food.isLiked ? Colors.red : Colors.grey,
@@ -135,17 +143,17 @@ class PostCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const Row(
+                    Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.access_time_rounded,
                           color: Colors.grey,
                           size: 18,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
-                          '3 phút',
-                          style: TextStyle(
+                          '${food.cooking_time ?? 0} phút',
+                          style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
                           ),
@@ -161,7 +169,7 @@ class PostCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${food.reviews}',
+                          '${food.reviews ?? 0}',
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,

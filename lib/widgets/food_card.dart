@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import '../../models/food.dart';
 import '../screen/recipe/recipe_screen.dart';
@@ -10,6 +11,7 @@ class FoodCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(Firebase.app().options.projectId);
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -36,7 +38,6 @@ class FoodCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Phần hình ảnh
                 Container(
                   width: double.infinity,
                   height: 120,
@@ -46,7 +47,7 @@ class FoodCard extends StatelessWidget {
                       topRight: Radius.circular(15),
                     ),
                     image: DecorationImage(
-                      image: AssetImage(food.image),
+                      image: NetworkImage(food.image),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -70,7 +71,7 @@ class FoodCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       // Mô tả món ăn
                       Text(
-                        "Món ăn truyền thống với hương vị đặc trưng...",
+                        food.description,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade600,
@@ -90,7 +91,7 @@ class FoodCard extends StatelessWidget {
                                   size: 14, color: Colors.grey),
                               const SizedBox(width: 4),
                               Text(
-                                "${food.time} phút",
+                                "${food.cooking_time} phút",
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey.shade600,
@@ -105,7 +106,7 @@ class FoodCard extends StatelessWidget {
                                   size: 14, color: Colors.orange[400]),
                               const SizedBox(width: 4),
                               Text(
-                                "${food.rate}",
+                                "${food.calories} cal",
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey.shade600,

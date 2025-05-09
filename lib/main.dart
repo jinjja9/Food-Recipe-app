@@ -8,7 +8,6 @@ import 'firebase_options.dart'; // File được tạo bởi flutterfire configu
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Khởi tạo Firebase với các cấu hình từ firebase_options.dart
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

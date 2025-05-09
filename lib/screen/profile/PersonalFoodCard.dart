@@ -19,7 +19,7 @@ class PersonalFoodCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
+            Image.network(
               food.image,
               fit: BoxFit.cover,
             ),
