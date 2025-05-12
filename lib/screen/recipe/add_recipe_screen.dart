@@ -6,6 +6,7 @@ import 'widgets/ingredient_item.dart';
 import 'widgets/step_item.dart';
 import 'widgets/section_title.dart';
 import 'widgets/custom_text_field.dart';
+import '../../../services/user_service.dart';
 
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
@@ -96,22 +97,27 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> with SingleTickerProv
                         // Image upload section
                         GestureDetector(
                           onTap: () {
-                            // TODO: Add image picker functionality
+                            vm.pickAndUploadImage();
                           },
                           child: Container(
                             width: double.infinity,
                             height: 200,
                             color: Colors.grey[300],
-                            child: const Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.add_a_photo, size: 50, color: Colors.grey),
-                                  SizedBox(height: 8),
-                                  Text('Thêm ảnh món ăn', style: TextStyle(color: Colors.grey, fontSize: 16)),
-                                ],
-                              ),
-                            ),
+                            child: vm.imageUrl != null
+                                ? Image.network(
+                                    vm.imageUrl!,
+                                    fit: BoxFit.cover,
+                                  )
+                                : const Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add_a_photo, size: 50, color: Colors.grey),
+                                        SizedBox(height: 8),
+                                        Text('Thêm ảnh món ăn', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                                      ],
+                                    ),
+                                  ),
                           ),
                         ),
                         Padding(

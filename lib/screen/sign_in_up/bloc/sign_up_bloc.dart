@@ -14,9 +14,9 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   }
 
   Future<void> _onSignUpSubmitted(
-    SignUpSubmitted event,
-    Emitter<SignUpState> emit,
-  ) async {
+      SignUpSubmitted event,
+      Emitter<SignUpState> emit,
+      ) async {
     emit(SignUpLoading());
 
     if (event.password != event.confirmPassword) {
@@ -26,7 +26,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
     try {
       final UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      await _auth.createUserWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
@@ -59,16 +59,16 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   }
 
   void _onSignUpReset(
-    SignUpReset event,
-    Emitter<SignUpState> emit,
-  ) {
+      SignUpReset event,
+      Emitter<SignUpState> emit,
+      ) {
     emit(SignUpInitial());
   }
 
   void _onSignUpToggleAgree(
-    SignUpToggleAgree event,
-    Emitter<SignUpState> emit,
-  ) {
+      SignUpToggleAgree event,
+      Emitter<SignUpState> emit,
+      ) {
     // Không cần xử lý gì nữa vì đã bỏ checkbox
   }
 }
