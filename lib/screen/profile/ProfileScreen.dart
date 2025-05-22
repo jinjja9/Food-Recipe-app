@@ -8,20 +8,20 @@ import '../../models/food.dart';
 import '../admin/UserListScreen.dart';
 import '../recipe/recipe_screen.dart';
 import 'PersonalFoodCard.dart';
+import '../../models/user.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final String userId;
+  const ProfileScreen({super.key, required this.userId});
+
+  Future<User?> fetchUser() async {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    if (!doc.exists) return null;
+    return User.fromFirestore(doc.id, doc.data()!);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final userId = 'jacob_w';
-    const String avatarPath = 'assets/images/avatar1.png';
-    const String username = '@jacob_w';
-    const String displayName = 'Jacob Williams';
-    const int postCount = 14;
-    const int likeCount = 38;
-    const int reviewCount = 20;
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
@@ -54,109 +54,159 @@ class ProfileScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: FutureBuilder<List<Food>>(
-        future: fetchAllFoods(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: FutureBuilder<User?>(
+        future: fetchUser(),
+        builder: (context, userSnapshot) {
+          if (userSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Bạn chưa có món ăn nào'));
+          if (!userSnapshot.hasData || userSnapshot.data == null) {
+            return const Center(child: Text('Không tìm thấy thông tin user'));
           }
-          final foods = snapshot.data!;
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  children: [
-                    // Profile section
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+          final user = userSnapshot.data!;
+          return FutureBuilder<List<Food>>(
+            future: fetchAllFoods(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final foods = snapshot.data ?? [];
+              final postCount = foods.length;
+              final totalLikes = foods.fold<int>(0, (sum, food) => sum + (food.likedUsers.length));
+              return SafeArea(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
                       children: [
-                        Center(
-                          child: Stack(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      backgroundButton,
-                                      backgroundButton.withOpacity(0.8),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                ),
-                                child: CircleAvatar(
-                                  radius: 60,
-                                  backgroundColor: Colors.white,
-                                  child: CircleAvatar(
-                                    radius: 58,
-                                    backgroundImage: AssetImage(avatarPath),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 5,
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: const BoxDecoration(
-                                      color: backgroundButton,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.camera_alt,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          username,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          displayName,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            _buildProfileStat(postCount.toString(), 'Bài đăng'),
-                            const SizedBox(width: 30),
-                            _buildProfileStat(likeCount.toString(), 'Lượt thích'),
-                            const SizedBox(width: 30),
-                            _buildProfileStat(reviewCount.toString(), 'Lượt đánh giá'),
+                            Center(
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          backgroundButton,
+                                          backgroundButton.withOpacity(0.8),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 60,
+                                      backgroundColor: Colors.white,
+                                      child: CircleAvatar(
+                                        radius: 58,
+                                        backgroundImage: user.avatarImage.startsWith('http')
+                                            ? NetworkImage(user.avatarImage) as ImageProvider
+                                            : AssetImage('assets/images/avatar1.png'),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.1),
+                                            blurRadius: 5,
+                                            spreadRadius: 1,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: const BoxDecoration(
+                                          color: backgroundButton,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              "@${user.name}",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildProfileStat(postCount.toString(), 'Bài đăng'),
+                                const SizedBox(width: 30),
+                                _buildProfileStat(totalLikes.toString(), 'Lượt thích'),
+                                const SizedBox(width: 30),
+                                _buildProfileStat('5', 'Lượt theo dõi'),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditProfileScreen(userId: userId),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: kprimaryColor,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text("Chỉnh sửa thông tin"),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const SignInScreen(),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: kprimaryColor,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text("Đăng xuất"),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -168,7 +218,7 @@ class ProfileScreen extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const EditProfileScreen(),
+                                      builder: (context) => const UserListScreen(),
                                     ),
                                   );
                                 },
@@ -179,104 +229,56 @@ class ProfileScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                child: const Text("Chỉnh sửa thông tin"),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const SignInScreen(),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kprimaryColor,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: const Text("Đăng xuất"),
+                                child: const Text("Danh sách người dùng"),
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // Row with Expanded to make the button same size
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const UserListScreen(),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: kprimaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text("Danh sách người dùng"),
-                          ),
+                        const SizedBox(height: 20),
+                        const Divider(
+                          thickness: 1,
+                          color: Colors.grey,
                         ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          "Danh sách món ăn của tôi",
+                          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 10),
+                        foods.isEmpty
+                            ? const Center(child: Text('Bạn chưa có món ăn nào'))
+                            : GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                ),
+                                itemCount: foods.length,
+                                itemBuilder: (context, index) {
+                                  final food = foods[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => RecipeScreen(
+                                            food: food,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: PersonalFoodCard(food: food),
+                                  );
+                                },
+                              ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    const Divider(
-                      thickness: 1,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 10),
-                    // "Danh sách món ăn của tôi"
-                    const Text(
-                      "Danh sách món ăn của tôi",
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10),
-                    // Grid for displaying the foods
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                      ),
-                      itemCount: foods.length,
-                      itemBuilder: (context, index) {
-                        final food = foods[index];
-                        return GestureDetector(
-                          onTap: () {
-                            // Khi nhấn vào card, chuyển sang màn hình RecipeScreen
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RecipeScreen(
-                                  food: food,
-                                ),
-                              ),
-                            );
-                          },
-                          child: PersonalFoodCard(food: food),
-                        );
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),
@@ -299,7 +301,10 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Future<List<Food>> fetchAllFoods() async {
-    final snapshot = await FirebaseFirestore.instance.collection('foods').get();
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('foods')
+        .where('uid', isEqualTo: userId)
+        .get();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
   }
 }

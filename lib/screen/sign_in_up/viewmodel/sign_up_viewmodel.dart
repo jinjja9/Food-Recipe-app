@@ -34,7 +34,7 @@ class SignUpViewModel extends ChangeNotifier {
 
   SignUpModel getSignUpData() {
     return SignUpModel(
-      username: usernameController.text,
+      name: usernameController.text,
       email: emailController.text,
       password: passwordController.text,
       confirmPassword: confirmPasswordController.text,

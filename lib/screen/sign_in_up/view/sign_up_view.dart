@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -32,7 +33,7 @@ class _SignUpViewContentState extends State<_SignUpViewContent> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
-      TextEditingController();
+  TextEditingController();
   bool _obscureText1 = true;
   bool _obscureText2 = true;
 
@@ -49,17 +50,17 @@ class _SignUpViewContentState extends State<_SignUpViewContent> {
           );
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const MainScreen()),
+            MaterialPageRoute(builder: (_) => MainScreen(userId: state.userId)),
           );
         } else if (state is SignUpFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.error)),
           );
-          if (state.error == 'Đăng kí thành công') {
-            await Future.delayed(const Duration(seconds: 1));
+          final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+          if (state.error == 'Đăng nhập thành công!') {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => MainScreen()),
+              MaterialPageRoute(builder: (_) => MainScreen(userId: userId)),
             );
           }
         }
@@ -174,17 +175,17 @@ class _SignUpViewContentState extends State<_SignUpViewContent> {
                           onPressed: state is SignUpLoading
                               ? null
                               : () {
-                                  context.read<SignUpBloc>().add(
-                                        SignUpSubmitted(
-                                          username: usernameController.text,
-                                          email: emailController.text,
-                                          password: passwordController.text,
-                                          confirmPassword:
-                                              confirmPasswordController.text,
-                                          agreeToTerms: true,
-                                        ),
-                                      );
-                                },
+                            context.read<SignUpBloc>().add(
+                              SignUpSubmitted(
+                                name: usernameController.text,
+                                email: emailController.text,
+                                password: passwordController.text,
+                                confirmPassword:
+                                confirmPasswordController.text,
+                                agreeToTerms: true,
+                              ),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             foregroundColor: Colors.white,
@@ -195,13 +196,13 @@ class _SignUpViewContentState extends State<_SignUpViewContent> {
                           ),
                           child: state is SignUpLoading
                               ? const CircularProgressIndicator(
-                                  color: Colors.white)
+                              color: Colors.white)
                               : const Text(
-                                  'Đăng ký',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                            'Đăng ký',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                       );
                     },
@@ -220,14 +221,14 @@ class _SignUpViewContentState extends State<_SignUpViewContent> {
   }
 
   Widget _buildTextField(
-    BuildContext context, {
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    required bool obscureText,
-    VoidCallback? onToggleVisibility,
-  }) {
+      BuildContext context, {
+        required TextEditingController controller,
+        required String label,
+        required String hint,
+        required IconData icon,
+        required bool obscureText,
+        VoidCallback? onToggleVisibility,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -248,12 +249,12 @@ class _SignUpViewContentState extends State<_SignUpViewContent> {
             prefixIcon: Icon(icon, color: backgroundButton),
             suffixIcon: onToggleVisibility != null
                 ? IconButton(
-                    icon: Icon(
-                      obscureText ? Icons.visibility_off : Icons.visibility,
-                      color: Colors.grey,
-                    ),
-                    onPressed: onToggleVisibility,
-                  )
+              icon: Icon(
+                obscureText ? Icons.visibility_off : Icons.visibility,
+                color: Colors.grey,
+              ),
+              onPressed: onToggleVisibility,
+            )
                 : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),

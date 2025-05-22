@@ -60,7 +60,6 @@ class AddRecipeViewModel extends ChangeNotifier {
   }
 
   Future<bool> saveRecipe(BuildContext context) async {
-    // Kiểm tra các trường bắt buộc
     if (nameController.text.isEmpty ||
         descriptionController.text.isEmpty ||
         caloController.text.isEmpty ||
@@ -75,29 +74,28 @@ class AddRecipeViewModel extends ChangeNotifier {
       isUploading = true;
       notifyListeners();
 
-      // Lấy thông tin người dùng hiện tại
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         return false;
       }
 
-      // Tạo map dữ liệu công thức
       final recipeData = {
         'name': nameController.text,
         'description': descriptionController.text,
         'category': selectedCategory,
+        'cooking_time': int.tryParse(timeController.text) ?? 0,
         'calories': int.tryParse(caloController.text) ?? 0,
-        'cookingTime': int.tryParse(timeController.text) ?? 0,
         'ingredients': ingredientControllers.map((controller) => controller.text).toList(),
         'steps': stepControllers.map((controller) => controller.text).toList(),
-        'createdBy': user.uid,
+        'uid': user.uid,
         'createdAt': FieldValue.serverTimestamp(),
         'likes': 0,
-        'comments': [],
+        'isLiked': false,
+        'likedUsers': [],
         'image': imageUrl,
       };
 
-      // Lưu vào Firestore
+      // Lưu
       await FirebaseFirestore.instance.collection('foods').add(recipeData);
 
       isUploading = false;

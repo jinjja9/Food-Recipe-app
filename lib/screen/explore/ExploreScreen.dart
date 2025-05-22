@@ -16,7 +16,7 @@ class ExploreScreen extends StatefulWidget {
 class _ExploreScreenState extends State<ExploreScreen> {
   Future<List<Food>> fetchFoods() async {
     final snapshot = await FirebaseFirestore.instance.collection('foods').get();
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
   }
 
   @override
@@ -31,7 +31,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // App Bar
             SliverAppBar(
               backgroundColor: Colors.white,
               elevation: 0,
@@ -64,7 +63,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 const SizedBox(width: 8),
               ],
             ),
-            // Content
             SliverPadding(
               padding: const EdgeInsets.only(top: 8),
               sliver: FutureBuilder<List<Food>>(

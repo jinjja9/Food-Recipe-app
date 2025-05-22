@@ -17,11 +17,12 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   ) async {
     emit(SignInLoading());
     try {
-      await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth.signInWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-      emit(SignInSuccess());
+      final userId = userCredential.user?.uid ?? '';
+      emit(SignInSuccess(userId));
     } on FirebaseAuthException catch (e) {
       String errorMessage;
       switch (e.code) {

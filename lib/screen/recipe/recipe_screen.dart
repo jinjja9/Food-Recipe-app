@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../core/color.dart';
 import '../../models/food.dart';
 import '../../widgets/rating_dialog.dart';
+import '../../widgets/liked_users_dialog.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Food food;
@@ -27,24 +29,9 @@ class _RecipeScreenState extends State<RecipeScreen>
     super.initState();
     _scrollController.addListener(_onScroll);
     _tabController = TabController(length: 2, vsync: this);
-    fetchCategoryName();
+    categoryName = widget.food.category.isNotEmpty ? widget.food.category : 'Chưa có thể loại';
   }
 
-  Future<void> fetchCategoryName() async {
-    if (widget.food.categoryId.isEmpty) {
-      setState(() {
-        categoryName = 'Chưa có thể loại';
-      });
-      return;
-    }
-    final doc = await FirebaseFirestore.instance.collection('categories').doc(widget.food.categoryId).get();
-    print('doc exists: ${doc.exists}');
-    print('doc data: ${doc.data()}');
-    setState(() {
-      categoryName = doc.data()?['name'] ?? "koco";
-    });
-    print('categoryId: ${widget.food.categoryId}');
-  }
 
   @override
   void dispose() {
@@ -68,6 +55,9 @@ class _RecipeScreenState extends State<RecipeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid ?? '';
+    final isFavorite = widget.food.likedUsers.contains(uid);
     return Scaffold(
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
@@ -96,9 +86,17 @@ class _RecipeScreenState extends State<RecipeScreen>
               isFavorite ? Icons.favorite : Icons.favorite_border,
               color: _showTitle ? Colors.red : Colors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
+              final foodRef = FirebaseFirestore.instance.collection('foods').doc(widget.food.id);
+              List<String> likedUsers = List<String>.from(widget.food.likedUsers);
+              if (isFavorite) {
+                likedUsers.remove(uid);
+              } else {
+                likedUsers.add(uid);
+              }
+              await foodRef.update({'likedUsers': likedUsers});
               setState(() {
-                isFavorite = !isFavorite;
+                widget.food.likedUsers = likedUsers;
               });
             },
           ),
@@ -275,7 +273,20 @@ class _RecipeScreenState extends State<RecipeScreen>
                           color: Colors.blue,
                         ),
                         _buildDivider(),
-                        _buildStatItem(icon: Icons.favorite, value: "${widget.food.likes}", label: "Lượt thích", color: Colors.red)
+                        _buildStatItem(
+                          icon: Icons.favorite,
+                          value: "${widget.food.likedUsers.length}",
+                          label: "Lượt thích",
+                          color: Colors.red,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => LikedUsersDialog(
+                                likedUserIds: widget.food.likedUsers,
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -299,13 +310,27 @@ class _RecipeScreenState extends State<RecipeScreen>
                     ),
                     child: Row(
                       children: [
-                        CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.white,
-                          child: CircleAvatar(
-                            radius: 58,
-                            backgroundImage: NetworkImage(widget.food.image),
-                          ),
+                        FutureBuilder<DocumentSnapshot>(
+                          future: FirebaseFirestore.instance.collection('users').doc(widget.food.uid).get(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const CircleAvatar(radius: 60, child: CircularProgressIndicator());
+                            }
+                            if (!snapshot.hasData || !snapshot.data!.exists) {
+                              return const CircleAvatar(radius: 60, child: Icon(Icons.person));
+                            }
+                            final userData = snapshot.data!.data() as Map<String, dynamic>;
+                            final avatarUrl = userData['avatarImage'] ?? '';
+                            return CircleAvatar(
+                              radius: 60,
+                              backgroundColor: Colors.white,
+                              child: CircleAvatar(
+                                radius: 58,
+                                backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                                child: avatarUrl.isEmpty ? const Icon(Icons.person) : null,
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -430,26 +455,30 @@ class _RecipeScreenState extends State<RecipeScreen>
     required String value,
     required String label,
     required Color color,
+    VoidCallback? onTap,
   }) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 12,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

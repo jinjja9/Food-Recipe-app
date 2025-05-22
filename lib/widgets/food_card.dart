@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../models/food.dart';
 import '../screen/recipe/recipe_screen.dart';
@@ -12,6 +14,9 @@ class FoodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print(Firebase.app().options.projectId);
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid ?? '';
+    final isLiked = food.likedUsers.contains(uid);
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -133,13 +138,25 @@ class FoodCard extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
-                  onPressed: () {
-                    food.isLiked = !food.isLiked;
+                  onPressed: () async {
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user == null) return;
+                    final uid = user.uid;
+                    final foodRef = FirebaseFirestore.instance.collection('foods').doc(food.id);
+                    List<String> likedUsers = List<String>.from(food.likedUsers);
+                    bool isLiked = likedUsers.contains(uid);
+                    if (isLiked) {
+                      likedUsers.remove(uid);
+                    } else {
+                      likedUsers.add(uid);
+                    }
+                    await foodRef.update({'likedUsers': likedUsers});
+                    food.likedUsers = likedUsers;
                     (context as Element).markNeedsBuild();
                   },
                   padding: EdgeInsets.zero,
                   iconSize: 18,
-                  icon: food.isLiked
+                  icon: isLiked
                       ? const Icon(Icons.favorite, color: Colors.red)
                       : const Icon(Icons.favorite_border, color: Colors.grey),
                 ),

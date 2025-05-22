@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../models/food.dart';
+import 'category_food_screen.dart';
+
 class AllCategoriesScreen extends StatefulWidget {
   const AllCategoriesScreen({super.key});
 
@@ -60,8 +63,21 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
                     itemBuilder: (context, index) {
                       final category = categories[index];
                       return GestureDetector(
-                        onTap: () {
-                          // TODO: Điều hướng đến màn CategoryFoodScreen với category['id'] hoặc category['name']
+                        onTap: () async {
+                          final foodsSnapshot = await FirebaseFirestore.instance
+                              .collection('foods')
+                              .where('category', isEqualTo: category['name'])
+                              .get();
+                          final foods = foodsSnapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CategoryFoodScreen(
+                                category: category['name'],
+                                categoryFoods: foods,
+                              ),
+                            ),
+                          );
                         },
                         child: Card(
                           elevation: 5,

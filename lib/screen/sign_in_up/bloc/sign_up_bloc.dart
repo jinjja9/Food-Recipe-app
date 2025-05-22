@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../services/user_service.dart';
 import 'sign_up_event.dart';
 import 'sign_up_state.dart';
 
@@ -18,22 +19,24 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       Emitter<SignUpState> emit,
       ) async {
     emit(SignUpLoading());
-
     if (event.password != event.confirmPassword) {
       emit(SignUpFailure('Mật khẩu xác nhận không khớp'));
       return;
     }
-
     try {
-      final UserCredential userCredential =
-      await _auth.createUserWithEmailAndPassword(
+      final userCredential = await _auth.createUserWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-
-      await userCredential.user?.updateDisplayName(event.username);
-
-      emit(SignUpSuccess('Đăng ký thành công!'));
+      final userId = userCredential.user?.uid ?? '';
+      await userCredential.user?.updateDisplayName(event.name);
+      await UserService.createUser(
+        uid: userId,
+        email: event.email,
+        name: event.name,
+        password: event.password,
+      );
+      emit(SignUpSuccess(userId, 'Đăng ký thành công!'));
     } on FirebaseAuthException catch (e) {
       String errorMessage;
       switch (e.code) {
@@ -53,8 +56,17 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
           errorMessage = 'Hãy điền đầy đủ thông tin';
       }
       emit(SignUpFailure(errorMessage));
-    } catch (e) {
-      emit(SignUpFailure('Đăng kí thành công'));
+    }catch (e) {
+      final user = _auth.currentUser;
+      if (user != null) {
+        await UserService.createUser(
+          uid: user.uid,
+          email: user.email ?? event.email,
+          name: event.name,
+          password: event.password,
+        );
+        emit(SignUpFailure('Đăng ký thành công!'));
+      }
     }
   }
 
@@ -69,6 +81,5 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       SignUpToggleAgree event,
       Emitter<SignUpState> emit,
       ) {
-    // Không cần xử lý gì nữa vì đã bỏ checkbox
   }
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../core/color.dart';
 import '../../models/food.dart';
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final Food food;
 
   const PostCard({
@@ -13,7 +14,15 @@ class PostCard extends StatelessWidget {
   });
 
   @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid ?? '';
+    final isLiked = widget.food.likedUsers.contains(uid);
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       shape: RoundedRectangleBorder(
@@ -29,9 +38,26 @@ class PostCard extends StatelessWidget {
             padding: const EdgeInsets.all(12.0),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundImage: NetworkImage(food.avatarImage),
+                FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(widget.food.uid)
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircleAvatar(radius: 24, child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return const CircleAvatar(radius: 24, child: Icon(Icons.person));
+                    }
+                    final userData = snapshot.data!.data() as Map<String, dynamic>;
+                    final avatarUrl = userData['avatarImage'] ?? '';
+                    return CircleAvatar(
+                      radius: 24,
+                      backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                      child: avatarUrl.isEmpty ? const Icon(Icons.person) : null,
+                    );
+                  },
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -39,7 +65,7 @@ class PostCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        food.author ?? 'Unknown Author',
+                        widget.food.author ?? 'Unknown Author',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -72,7 +98,7 @@ class PostCard extends StatelessWidget {
                   topRight: Radius.circular(4),
                 ),
                 child: Image.network(
-                  food.image ?? 'https://via.placeholder.com/400x300',
+                  widget.food.image ?? 'https://via.placeholder.com/400x300',
                   width: double.infinity,
                   height: 220,
                   fit: BoxFit.cover,
@@ -104,7 +130,7 @@ class PostCard extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
-                    food.name ?? 'Untitled Recipe',
+                    widget.food.name ?? 'Untitled Recipe',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -127,17 +153,32 @@ class PostCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          Icons.favorite,
-                          color: food.isLiked ? Colors.red : Colors.grey,
-                          size: 20,
+                        IconButton(
+                          icon: Icon(
+                            Icons.favorite,
+                            color: isLiked ? Colors.red : Colors.grey,
+                            size: 20,
+                          ),
+                          onPressed: () async {
+                            final foodRef = FirebaseFirestore.instance.collection('foods').doc(widget.food.id);
+                            List<String> likedUsers = List<String>.from(widget.food.likedUsers);
+                            if (isLiked) {
+                              likedUsers.remove(uid);
+                            } else {
+                              likedUsers.add(uid);
+                            }
+                            await foodRef.update({'likedUsers': likedUsers});
+                            setState(() {
+                              widget.food.likedUsers = likedUsers;
+                            });
+                          },
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${food.likes ?? 0}',
+                          '${widget.food.likedUsers.length}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: food.isLiked ? Colors.red : Colors.grey,
+                            color: isLiked ? Colors.red : Colors.grey,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -152,7 +193,7 @@ class PostCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${food.cooking_time ?? 0} phút',
+                          '${widget.food.cooking_time ?? 0} phút',
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -169,7 +210,7 @@ class PostCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${food.reviews ?? 0}',
+                          '${widget.food.reviews ?? 0}',
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,

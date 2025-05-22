@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<List<Food>> fetchFoods() async {
     final snapshot = await FirebaseFirestore.instance.collection('foods').get();
     print('Số lượng món ăn lấy được: \\${snapshot.docs.length}');
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
   }
 
   @override
@@ -86,15 +86,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Categories(
                 currentCat: currentCat,
-                onCategorySelected: (category) {
-                  setState(() {
-                    currentCat = category;
-                  });
+                onCategorySelected: (categoryName) async {
+                  final foodsSnapshot = await FirebaseFirestore.instance
+                      .collection('foods')
+                      .where('category', isEqualTo: categoryName)
+                      .get();
+                  final foods = foodsSnapshot.docs.map((doc) => Food.fromFirestore(doc.data(),doc.id)).toList();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => CategoryFoodScreen(
-                        category: category, categoryFoods: [],
+                        category: categoryName,
+                        categoryFoods: foods,
                       ),
                     ),
                   );

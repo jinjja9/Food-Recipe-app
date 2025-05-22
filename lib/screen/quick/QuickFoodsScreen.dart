@@ -14,7 +14,7 @@ class QuickFoodsScreen extends StatefulWidget {
 class _QuickFoodsScreenState extends State<QuickFoodsScreen> {
   Future<List<Food>> fetchFoods() async {
     final snapshot = await FirebaseFirestore.instance.collection('foods').get();
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
   }
 
   @override

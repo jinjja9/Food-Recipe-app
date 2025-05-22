@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../recipe/add_recipe_screen.dart';
 import 'CategoryManagementScreen.dart';
@@ -23,93 +25,9 @@ class _UserListScreenState extends State<UserListScreen> {
     "Mới nhất"
   ];
 
-  final List<Map<String, dynamic>> _users = [
-    {
-      "name": "jacob_w",
-      "avatar": "assets/images/avatar1.png",
-      "posts": "14",
-      "likes": "38",
-      "joinDate": "15/03/2023",
-      "status": "active",
-      "role": "Người dùng",
-    },
-    {
-      "name": "alice_t",
-      "avatar": "assets/images/avatar2.png",
-      "posts": "9",
-      "likes": "25",
-      "joinDate": "22/04/2023",
-      "status": "active",
-      "role": "Người dùng",
-    },
-    {
-      "name": "john_doe",
-      "avatar": "assets/images/avatar3.png",
-      "posts": "20",
-      "likes": "55",
-      "joinDate": "10/01/2023",
-      "status": "active",
-      "role": "Người dùng",
-    },
-    {
-      "name": "emma_s",
-      "avatar": "assets/images/avatar4.png",
-      "posts": "7",
-      "likes": "19",
-      "joinDate": "05/05/2023",
-      "status": "inactive",
-      "role": "Người dùng",
-    },
-    {
-      "name": "michael_j",
-      "avatar": "assets/images/avatar5.png",
-      "posts": "16",
-      "likes": "42",
-      "joinDate": "18/02/2023",
-      "status": "active",
-      "role": "Người dùng",
-    },
-    {
-      "name": "chef_gordon",
-      "avatar": "assets/images/avatar6.png",
-      "posts": "32",
-      "likes": "128",
-      "joinDate": "01/01/2023",
-      "status": "active",
-      "role": "Đầu bếp",
-    },
-    {
-      "name": "admin_user",
-      "avatar": "assets/images/avatar7.png",
-      "posts": "5",
-      "likes": "17",
-      "joinDate": "01/01/2023",
-      "status": "active",
-      "role": "Admin",
-    },
-  ];
-
-  List<Map<String, dynamic>> get filteredUsers {
-    return _users.where((user) {
-      final nameMatches =
-          user["name"].toLowerCase().contains(_searchQuery.toLowerCase());
-
-      if (_selectedFilter == "Tất cả") {
-        return nameMatches;
-      } else if (_selectedFilter == "Nhiều bài đăng") {
-        return nameMatches && int.parse(user["posts"]) >= 10;
-      } else if (_selectedFilter == "Nhiều lượt thích") {
-        return nameMatches && int.parse(user["likes"]) >= 30;
-      } else if (_selectedFilter == "Mới nhất") {
-        // Giả sử ngày tham gia có định dạng dd/mm/yyyy
-        final parts = user["joinDate"].split('/');
-        final joinDate = DateTime(
-            int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
-        final oneMonthAgo = DateTime.now().subtract(const Duration(days: 30));
-        return nameMatches && joinDate.isAfter(oneMonthAgo);
-      }
-      return nameMatches;
-    }).toList();
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -138,7 +56,7 @@ class _UserListScreenState extends State<UserListScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const UserDetailScreen(),
+                      builder: (context) => UserDetailScreen(userId: user['uid']),
                     ),
                   );
                 },
@@ -148,7 +66,6 @@ class _UserListScreenState extends State<UserListScreen> {
                 title: const Text("Chỉnh sửa thông tin"),
                 onTap: () {
                   Navigator.pop(context);
-                  // Hiển thị form chỉnh sửa thông tin
                 },
               ),
               if (user["status"] == "active")
@@ -166,15 +83,7 @@ class _UserListScreenState extends State<UserListScreen> {
                   title: const Text("Mở khóa tài khoản"),
                   onTap: () {
                     Navigator.pop(context);
-                    setState(() {
-                      user["status"] = "active";
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Đã mở khóa tài khoản ${user["name"]}"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    _updateUserStatus(user, "active");
                   },
                 ),
               ListTile(
@@ -197,8 +106,7 @@ class _UserListScreenState extends State<UserListScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Khóa tài khoản"),
-        content:
-            Text("Bạn có chắc chắn muốn khóa tài khoản ${user["name"]} không?"),
+        content: Text("Bạn có chắc chắn muốn khóa tài khoản ${user["username"]} không?"),
         actions: [
           TextButton(
             onPressed: () {
@@ -208,16 +116,8 @@ class _UserListScreenState extends State<UserListScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                user["status"] = "inactive";
-              });
+              _updateUserStatus(user, "inactive");
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Đã khóa tài khoản ${user["name"]}"),
-                  backgroundColor: Colors.orange,
-                ),
-              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -235,7 +135,7 @@ class _UserListScreenState extends State<UserListScreen> {
       builder: (context) => AlertDialog(
         title: const Text("Xóa tài khoản"),
         content: Text(
-          "Bạn có chắc chắn muốn xóa tài khoản ${user["name"]} không? "
+          "Bạn có chắc chắn muốn xóa tài khoản ${user["username"]} không? "
           "Hành động này không thể hoàn tác và tất cả dữ liệu của người dùng sẽ bị xóa.",
         ),
         actions: [
@@ -246,17 +146,29 @@ class _UserListScreenState extends State<UserListScreen> {
             child: const Text("Hủy"),
           ),
           ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _users.remove(user);
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Đã xóa tài khoản ${user["name"]}"),
-                  backgroundColor: Colors.red,
-                ),
-              );
+            onPressed: () async {
+              try {
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(user['uid'])
+                    .delete();
+                
+                await FirebaseAuth.instance
+                    .currentUser?.delete();
+
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Đã xóa tài khoản ${user["username"]}')),
+                  );
+                  Navigator.pop(context);
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Lỗi khi xóa tài khoản: $e')),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -268,14 +180,34 @@ class _UserListScreenState extends State<UserListScreen> {
     );
   }
 
+  Future<void> _updateUserStatus(Map<String, dynamic> user, String status) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user['uid'])
+          .update({'status': status});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(status == "active" 
+                ? "Đã mở khóa tài khoản ${user["username"]}"
+                : "Đã khóa tài khoản ${user["username"]}"),
+            backgroundColor: status == "active" ? Colors.green : Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi khi cập nhật trạng thái: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    int totalPosts =
-        _users.fold(0, (sum, user) => sum + int.parse(user['posts']!));
-    int totalLikes =
-        _users.fold(0, (sum, user) => sum + int.parse(user['likes']!));
-    double avgPosts = _users.isNotEmpty ? totalPosts / _users.length : 0;
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70.0),
@@ -317,7 +249,6 @@ class _UserListScreenState extends State<UserListScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Thanh tìm kiếm và bộ lọc
             Container(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -379,155 +310,207 @@ class _UserListScreenState extends State<UserListScreen> {
               ),
             ),
 
-            // Thống kê
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatItem(
-                        Icons.people,
-                        Colors.blue,
-                        _users.length.toString(),
-                        "Người dùng",
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance.collection('users').snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final users = snapshot.data!.docs;
+                final totalUsers = users.length;
+                final totalPosts = users.fold<int>(
+                  0,
+                  (sum, doc) => sum +  0,
+                );
+                final totalLikes = users.fold<int>(
+                  0,
+                  (sum, doc) => sum +  0,
+                );
+                final avgPosts = totalUsers > 0 ? totalPosts / totalUsers : 0;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem(
+                            Icons.people,
+                            Colors.blue,
+                            totalUsers.toString(),
+                            "Người dùng",
+                          ),
+                          _buildStatItem(
+                            Icons.post_add,
+                            Colors.green,
+                            totalPosts.toString(),
+                            "Bài đăng",
+                          ),
+                          _buildStatItem(
+                            Icons.favorite,
+                            Colors.red,
+                            totalLikes.toString(),
+                            "Lượt thích",
+                          ),
+                          _buildStatItem(
+                            Icons.analytics,
+                            Colors.orange,
+                            avgPosts.toStringAsFixed(1),
+                            "TB bài/người",
+                          ),
+                        ],
                       ),
-                      _buildStatItem(
-                        Icons.post_add,
-                        Colors.green,
-                        totalPosts.toString(),
-                        "Bài đăng",
-                      ),
-                      _buildStatItem(
-                        Icons.favorite,
-                        Colors.red,
-                        totalLikes.toString(),
-                        "Lượt thích",
-                      ),
-                      _buildStatItem(
-                        Icons.analytics,
-                        Colors.orange,
-                        avgPosts.toStringAsFixed(1),
-                        "TB bài/người",
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
 
             const SizedBox(height: 16),
 
-            // Danh sách người dùng
             Expanded(
-              child: filteredUsers.isEmpty
-                  ? const Center(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('users').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final users = snapshot.data!.docs.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    return {
+                      ...data,
+                      'uid': doc.id,
+                    };
+                  }).where((user) {
+                    final nameMatches = user['username']
+                        .toString()
+                        .toLowerCase()
+                        .contains(_searchQuery.toLowerCase());
+
+                    if (_selectedFilter == "Tất cả") {
+                      return nameMatches;
+                    } else if (_selectedFilter == "Nhiều bài đăng") {
+                      return nameMatches && (user['posts'] ?? 0) >= 10;
+                    } else if (_selectedFilter == "Nhiều lượt thích") {
+                      return nameMatches && (user['likes'] ?? 0) >= 30;
+                    } else if (_selectedFilter == "Mới nhất") {
+                      final createdAt = (user['createdAt'] as Timestamp?)?.toDate();
+                      if (createdAt == null) return false;
+                      final oneMonthAgo = DateTime.now().subtract(const Duration(days: 30));
+                      return nameMatches && createdAt.isAfter(oneMonthAgo);
+                    }
+                    return nameMatches;
+                  }).toList();
+
+                  if (users.isEmpty) {
+                    return const Center(
                       child: Text(
                         "Không tìm thấy người dùng nào",
                         style: TextStyle(fontSize: 16),
                       ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: filteredUsers.length,
-                      itemBuilder: (context, index) {
-                        final user = filteredUsers[index];
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: InkWell(
-                            onTap: () => _showUserActionSheet(user),
-                            borderRadius: BorderRadius.circular(12),
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage:
-                                        AssetImage(user['avatar']!),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              user['name']!,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            _buildRoleBadge(user['role']),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.calendar_today,
-                                                size: 14,
-                                                color: Colors.grey.shade600),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              "Tham gia: ${user['joinDate']}",
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey.shade600,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              "${user['posts']} bài đăng",
-                                              style:
-                                                  const TextStyle(fontSize: 14),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Text(
-                                              "${user['likes']} lượt thích",
-                                              style:
-                                                  const TextStyle(fontSize: 14),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Column(
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: users.length,
+                    itemBuilder: (context, index) {
+                      final user = users[index];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: InkWell(
+                          onTap: () => _showUserActionSheet(user),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: AssetImage(user['avatar'] ?? 'assets/images/avatar1.png'),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      _buildStatusBadge(user['status']),
-                                      const SizedBox(height: 8),
-                                      IconButton(
-                                        icon: const Icon(Icons.more_vert),
-                                        onPressed: () =>
-                                            _showUserActionSheet(user),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            user['username'] ?? 'Unknown',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          _buildRoleBadge(user['role'] ?? 'user'),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.calendar_today,
+                                              size: 14,
+                                              color: Colors.grey.shade600),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            "Tham gia: ${(user['createdAt'] as Timestamp?)?.toDate().toString().split(' ')[0] ?? 'N/A'}",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${user['posts'] ?? 0} bài đăng",
+                                            style: const TextStyle(fontSize: 14),
+                                          ),
+                                          const SizedBox(width: 16),
+                                          Text(
+                                            "${user['likes'] ?? 0} lượt thích",
+                                            style: const TextStyle(fontSize: 14),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                Column(
+                                  children: [
+                                    _buildStatusBadge(user['status'] ?? 'active'),
+                                    const SizedBox(height: 8),
+                                    IconButton(
+                                      icon: const Icon(Icons.more_vert),
+                                      onPressed: () => _showUserActionSheet(user),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -636,10 +619,10 @@ class _UserListScreenState extends State<UserListScreen> {
     Color color;
 
     switch (role) {
-      case "Admin":
+      case "admin":
         color = Colors.red;
         break;
-      case "Đầu bếp":
+      case "chef":
         color = Colors.purple;
         break;
       default:
@@ -655,7 +638,7 @@ class _UserListScreenState extends State<UserListScreen> {
         border: Border.all(color: color),
       ),
       child: Text(
-        role,
+        role == "admin" ? "Admin" : role == "chef" ? "Đầu bếp" : "Người dùng",
         style: TextStyle(
           color: color,
           fontSize: 10,

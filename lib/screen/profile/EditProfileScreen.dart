@@ -1,36 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../models/user.dart' as app_model;
 
 import '../../core/color.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  final String userId;
+  const EditProfileScreen({super.key, required this.userId});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final TextEditingController _nameController =
-      TextEditingController(text: 'Jacob Williams');
-  final TextEditingController _usernameController =
-      TextEditingController(text: 'jacob_w');
-  final TextEditingController _emailController =
-      TextEditingController(text: 'jacob.williams@example.com');
-  final TextEditingController _bioController = TextEditingController(
-      text:
-          'Passionate food lover and home chef. I love creating and sharing delicious recipes!');
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isEdited = false;
 
+  late Future<app_model.User?> _userFuture;
+
   @override
   void initState() {
     super.initState();
+    _userFuture = fetchUser();
     _nameController.addListener(_checkEdited);
     _usernameController.addListener(_checkEdited);
     _emailController.addListener(_checkEdited);
@@ -39,13 +39,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _confirmPasswordController.addListener(_checkEdited);
   }
 
+  Future<app_model.User?> fetchUser() async {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(widget.userId).get();
+    if (!doc.exists) return null;
+    return app_model.User.fromFirestore(doc.id, doc.data()!);
+  }
+
   void _checkEdited() {
     setState(() {
-      _isEdited = _nameController.text != 'Jacob Williams' ||
-          _usernameController.text != 'jacob_w' ||
-          _emailController.text != 'jacob.williams@example.com' ||
-          _bioController.text !=
-              'Passionate food lover and home chef. I love creating and sharing delicious recipes!' ||
+      _isEdited = _nameController.text != '' ||
+          _usernameController.text != '' ||
+          _emailController.text != '' ||
+          _bioController.text != '' ||
           _passwordController.text.isNotEmpty ||
           _confirmPasswordController.text.isNotEmpty;
     });
@@ -64,7 +69,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Set status bar color
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -89,7 +93,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           TextButton(
             onPressed: _isEdited
                 ? () {
-                    // Show success dialog
                     _showSuccessDialog();
                   }
                 : null,
@@ -104,198 +107,206 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile picture section
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Center(
-                    child: Stack(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: [
-                                backgroundButton,
-                                backgroundButton.withOpacity(0.8),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: const CircleAvatar(
-                            radius: 60,
-                            backgroundColor: Colors.white,
-                            child: CircleAvatar(
-                              radius: 58,
-                              backgroundImage:
-                                  AssetImage('assets/images/avatar1.png'),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: const BoxDecoration(
-                                color: backgroundButton,
+      body: FutureBuilder<app_model.User?>(
+        future: _userFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('Không tìm thấy thông tin user'));
+          }
+          final user = snapshot.data!;
+          // Gán dữ liệu vào controller nếu chưa gán
+          if (_nameController.text.isEmpty && _usernameController.text.isEmpty && _emailController.text.isEmpty) {
+            _usernameController.text = user.name;
+            _emailController.text = user.email;
+          }
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: Stack(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    backgroundButton,
+                                    backgroundButton.withOpacity(0.8),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
-                                size: 20,
+                              child: CircleAvatar(
+                                radius: 60,
+                                backgroundColor: Colors.white,
+                                child: CircleAvatar(
+                                  radius: 58,
+                                  backgroundImage: user.avatarImage.isNotEmpty
+                                      ? NetworkImage(user.avatarImage) as ImageProvider
+                                      : const AssetImage('assets/images/avatar1.png'),
+                                ),
                               ),
                             ),
-                          ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 5,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: const BoxDecoration(
+                                    color: backgroundButton,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Thay đổi ảnh đại diện",
-                    style: TextStyle(
-                      color: backgroundButton,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 15),
-            // Personal information section
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Thông tin cá nhân",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField(
-                    controller: _nameController,
-                    label: "Họ và tên",
-                    hint: "Nhập họ và tên của bạn",
-                    icon: Icons.person_outline,
-                  ),
-                  const SizedBox(height: 15),
-                  _buildTextField(
-                    controller: _usernameController,
-                    label: "Tên người dùng",
-                    hint: "Nhập tên người dùng của bạn",
-                    icon: Icons.alternate_email,
-                    prefix: "@",
-                  ),
-                  const SizedBox(height: 15),
-                  _buildTextField(
-                    controller: _emailController,
-                    label: "Email",
-                    hint: "Nhập email của bạn",
-                    icon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 15),
-            // Password section
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Đổi mật khẩu",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField(
-                    controller: _passwordController,
-                    label: "Mật khẩu mới",
-                    hint: "Nhập mật khẩu mới của bạn",
-                    icon: Icons.lock_outline,
-                    obscureText: _obscurePassword,
-                    onToggleVisibility: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 15),
-                  _buildTextField(
-                    controller: _confirmPasswordController,
-                    label: "Xác nhận mật khẩu",
-                    hint: "Nhập lại mật khẩu của bạn",
-                    icon: Icons.lock_outline,
-                    obscureText: _obscureConfirmPassword,
-                    onToggleVisibility: () {
-                      setState(() {
-                        _obscureConfirmPassword = !_obscureConfirmPassword;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            // Delete account button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextButton.icon(
-                onPressed: () {
-                  // Show delete account confirmation
-                  _showDeleteAccountDialog();
-                },
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                label: const Text(
-                  "Xóa tài khoản",
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w500,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Thay đổi ảnh đại diện",
+                        style: TextStyle(
+                          color: backgroundButton,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  alignment: Alignment.center,
+                const SizedBox(height: 15),
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Thông tin cá nhân",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      _buildTextField(
+                        controller: _usernameController,
+                        label: "Tên người dùng",
+                        hint: "Nhập tên người dùng của bạn",
+                        icon: Icons.alternate_email,
+                        prefix: "@",
+                      ),
+                      const SizedBox(height: 15),
+                      _buildTextField(
+                        controller: _emailController,
+                        label: "Email",
+                        hint: "Nhập email của bạn",
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 15),
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Đổi mật khẩu",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      _buildTextField(
+                        controller: _passwordController,
+                        label: "Mật khẩu mới",
+                        hint: "Nhập mật khẩu mới của bạn",
+                        icon: Icons.lock_outline,
+                        obscureText: _obscurePassword,
+                        onToggleVisibility: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 15),
+                      _buildTextField(
+                        controller: _confirmPasswordController,
+                        label: "Xác nhận mật khẩu",
+                        hint: "Nhập lại mật khẩu của bạn",
+                        icon: Icons.lock_outline,
+                        obscureText: _obscureConfirmPassword,
+                        onToggleVisibility: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Center(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        _showDeleteAccountDialog();
+                      },
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      label: const Text(
+                        "Xóa tài khoản",
+                        style: TextStyle(
+                          fontSize: 16
+                          ,color: Colors.red,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 30),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -378,7 +389,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Success icon
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
@@ -392,7 +402,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Success message
                 const Text(
                   'Cập nhật thành công!',
                   style: TextStyle(
@@ -410,7 +419,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 25),
-                // Continue button
                 Container(
                   width: double.infinity,
                   height: 50,
@@ -427,8 +435,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Return to profile
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,

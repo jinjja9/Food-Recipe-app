@@ -7,7 +7,8 @@ import '../profile/ProfileScreen.dart';
 import 'home_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final String userId;
+  const MainScreen({super.key, required this.userId});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -15,15 +16,16 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int currentTab = 0;
-  List screens = const [
-    HomeScreen(),
-    ExploreScreen(),
-    FavoriteScreen(),
-    ProfileScreen(),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    List screens = [
+      const HomeScreen(),
+      const ExploreScreen(),
+      const FavoriteScreen(),
+      ProfileScreen(userId: widget.userId),
+    ];
+
     return Scaffold(
       body: screens[currentTab],
       bottomNavigationBar: Container(

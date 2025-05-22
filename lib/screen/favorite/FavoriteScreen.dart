@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../models/food.dart';
 import '../../widgets/food_card.dart';
@@ -14,7 +15,7 @@ class FavoriteScreen extends StatefulWidget {
 class _FavoriteScreenState extends State<FavoriteScreen> {
   Future<List<Food>> fetchFoods() async {
     final snapshot = await FirebaseFirestore.instance.collection('foods').get();
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
   }
 
   @override
@@ -61,8 +62,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Center(child: Text('Không có món ăn nào'));
             }
-            // Lọc các món ăn yêu thích nếu có trường isLiked
-            final favoriteFoods = snapshot.data!.where((food) => food.isLiked == true).toList();
+            // Lọc các món ăn yêu thích
+            final user = FirebaseAuth.instance.currentUser;
+            final uid = user?.uid ?? '';
+            final favoriteFoods = snapshot.data!.where((food) => food.likedUsers.contains(uid)).toList();
             return CustomScrollView(
               slivers: [
                 SliverPadding(

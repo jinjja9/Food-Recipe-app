@@ -8,7 +8,7 @@ class PopularFoodScreen extends StatelessWidget {
 
   Future<List<Food>> fetchPopularFoods() async {
     final snapshot = await FirebaseFirestore.instance.collection('foods').get();
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data())).toList();
+    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
   }
 
   @override

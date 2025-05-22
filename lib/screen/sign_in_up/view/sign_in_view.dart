@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -37,17 +38,17 @@ class _SignInViewState extends State<SignInView> {
             );
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => MainScreen()),
+              MaterialPageRoute(builder: (_) => MainScreen(userId: state.userId)),
             );
           } else if (state is SignInFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.error)),
             );
+            final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
             if (state.error == 'Đăng nhập thành công!') {
-              await Future.delayed(const Duration(seconds: 1));
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => MainScreen()),
+                MaterialPageRoute(builder: (_) => MainScreen(userId: userId)),
               );
             }
           }

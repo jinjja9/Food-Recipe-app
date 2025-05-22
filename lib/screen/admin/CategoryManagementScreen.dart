@@ -13,7 +13,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final TextEditingController _categoryDescriptionController =
       TextEditingController();
 
-  // Danh sách thể loại giả lập
   final List<Map<String, dynamic>> _categories = [
     {
       "id": 1,
@@ -52,7 +51,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     },
   ];
 
-  // Danh sách màu để chọn
   final List<Color> _colorOptions = [
     Colors.red,
     Colors.orange,
@@ -151,7 +149,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Thêm thể loại mới
                   if (_categoryNameController.text.isNotEmpty) {
                     setState(() {
                       _categories.add({
@@ -260,7 +257,6 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Cập nhật thể loại
                   if (_categoryNameController.text.isNotEmpty) {
                     setState(() {
                       _categories[index] = {
