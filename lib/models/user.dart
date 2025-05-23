@@ -7,6 +7,7 @@ class User {
   final String? displayName;
   final String name;
   final DateTime? createdAt;
+  final List<String> followers;
 
   User({
     required this.id,
@@ -17,6 +18,7 @@ class User {
     this.displayName,
     required this.name,
     this.createdAt,
+    this.followers = const [],
   });
 
   factory User.fromFirestore(String id, Map<String, dynamic> data) {
@@ -31,6 +33,7 @@ class User {
       createdAt: data['createdAt'] != null
           ? DateTime.tryParse(data['createdAt'].toString())
           : null,
+      followers: List<String>.from(data['followers'] ?? []),
     );
   }
 }

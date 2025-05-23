@@ -24,7 +24,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<List<Food>> fetchFoods() async {
     final snapshot = await FirebaseFirestore.instance.collection('foods').get();
     print('Số lượng món ăn lấy được: \\${snapshot.docs.length}');
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
+    final foods = snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
+    // Sort foods by likes in descending order and take top 4
+    foods.sort((a, b) => b.likes.compareTo(a.likes));
+    return foods.take(4).toList();
   }
 
   @override

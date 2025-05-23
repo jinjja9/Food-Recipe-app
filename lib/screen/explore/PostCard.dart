@@ -36,56 +36,85 @@ class _PostCardState extends State<PostCard> {
           // Header with author info
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Row(
-              children: [
-                FutureBuilder<DocumentSnapshot>(
-                  future: FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(widget.food.uid)
-                      .get(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircleAvatar(radius: 24, child: CircularProgressIndicator());
-                    }
-                    if (!snapshot.hasData || !snapshot.data!.exists) {
-                      return const CircleAvatar(radius: 24, child: Icon(Icons.person));
-                    }
-                    final userData = snapshot.data!.data() as Map<String, dynamic>;
-                    final avatarUrl = userData['avatarImage'] ?? '';
-                    return CircleAvatar(
-                      radius: 24,
-                      backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                      child: avatarUrl.isEmpty ? const Icon(Icons.person) : null,
-                    );
-                  },
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(widget.food.uid)
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Row(
                     children: [
-                      Text(
-                        widget.food.author ?? 'Unknown Author',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "13/03/2024",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
+                      CircleAvatar(radius: 24, child: CircularProgressIndicator()),
+                      SizedBox(width: 12),
+                      Text('Đang tải...', style: TextStyle(fontSize: 16)),
+                    ],
+                  );
+                }
+
+                if (!snapshot.hasData || !snapshot.data!.exists) {
+                  return const Row(
+                    children: [
+                      CircleAvatar(radius: 24, child: Icon(Icons.person)),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Unknown Author',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.more_vert, color: Colors.grey),
-                  onPressed: () {},
-                ),
-              ],
+                  );
+                }
+
+                final userData = snapshot.data!.data() as Map<String, dynamic>;
+                final avatarUrl = userData['avatarImage'] ?? '';
+                final name = userData['name'] ?? 'Unknown';
+                final createdAtRaw = userData['createdAt'];
+                final createdAt = createdAtRaw is Timestamp
+                    ? createdAtRaw.toDate()
+                    : DateTime.tryParse(createdAtRaw.toString());
+                final formattedDate = createdAt != null
+                    ? '${createdAt.hour.toString().padLeft(2, '0')}:${createdAt.minute.toString().padLeft(2, '0')} '
+                    '${createdAt.day.toString().padLeft(2, '0')}/${createdAt.month.toString().padLeft(2, '0')}/${createdAt.year}'
+                    : 'N/A';
+
+                return Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                      child: avatarUrl.isEmpty ? const Icon(Icons.person) : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            formattedDate,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.more_vert, color: Colors.grey),
+                      onPressed: () {},
+                    ),
+                  ],
+                );
+              },
             ),
           ),
 
@@ -142,6 +171,26 @@ class _PostCardState extends State<PostCard> {
             ],
           ),
 
+          // Description section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.food.description ?? 'Chưa có mô tả',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.grey[800],
+                    height: 1.5,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+
           // Engagement stats and action buttons
           Padding(
             padding: const EdgeInsets.all(12.0),
@@ -188,7 +237,7 @@ class _PostCardState extends State<PostCard> {
                       children: [
                         const Icon(
                           Icons.access_time_rounded,
-                          color: Colors.grey,
+                          color: Colors.blue,
                           size: 18,
                         ),
                         const SizedBox(width: 4),
@@ -196,7 +245,7 @@ class _PostCardState extends State<PostCard> {
                           '${widget.food.cooking_time ?? 0} phút',
                           style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.grey,
+                            color: Colors.blue,
                           ),
                         ),
                       ],
@@ -204,16 +253,16 @@ class _PostCardState extends State<PostCard> {
                     Row(
                       children: [
                         const Icon(
-                          Icons.rate_review,
-                          color: Colors.grey,
+                          Icons.local_fire_department_rounded,
+                          color: Colors.orange,
                           size: 18,
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${widget.food.reviews ?? 0}',
+                          '${widget.food.calories ?? 0}',
                           style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.grey,
+                            color: Colors.orange,
                           ),
                         ),
                       ],

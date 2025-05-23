@@ -10,13 +10,11 @@ class Food {
   String category;
   List<String> ingredients;
   List<String> steps;
-  String author;
   String uid;
   bool isLiked;
-  double rate;
-  int reviews;
   int likes;
   List<String> likedUsers;
+  //List<String> follower;
   final Timestamp? createdAt;
 
   Food({
@@ -30,12 +28,10 @@ class Food {
     this.uid = '',
     this.ingredients = const [],
     this.steps = const [],
-    this.author = '',
     this.isLiked = false,
-    this.rate = 0.0,
-    this.reviews = 0,
     this.likes = 0,
     this.likedUsers = const [],
+    //this.follower = const [],
     this.createdAt,
   });
 
@@ -59,7 +55,10 @@ class Food {
       likedUsers: (data['likedUsers'] is List)
         ? (data['likedUsers'] as List).map((e) => e.toString()).toList()
         : <String>[],
-      createdAt: data['createdAt'] is Timestamp ? data['createdAt'] : null,
+      // follower: (data['follower'] is List)
+      //     ? (data['follower'] as List).map((e) => e.toString()).toList()
+      //     : <String>[],
+      // createdAt: data['createdAt'] is Timestamp ? data['createdAt'] : null,
     );
   }
 }

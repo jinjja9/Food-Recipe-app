@@ -13,9 +13,13 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
-  Future<List<Food>> fetchFoods() async {
-    final snapshot = await FirebaseFirestore.instance.collection('foods').get();
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
+  Stream<List<Food>> getFoodsStream() {
+    return FirebaseFirestore.instance
+        .collection('foods')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Food.fromFirestore(doc.data(), doc.id))
+            .toList());
   }
 
   @override
@@ -53,8 +57,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         ),
       ),
       body: SafeArea(
-        child: FutureBuilder<List<Food>>(
-          future: fetchFoods(),
+        child: StreamBuilder<List<Food>>(
+          stream: getFoodsStream(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -66,6 +70,11 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
             final user = FirebaseAuth.instance.currentUser;
             final uid = user?.uid ?? '';
             final favoriteFoods = snapshot.data!.where((food) => food.likedUsers.contains(uid)).toList();
+            
+            if (favoriteFoods.isEmpty) {
+              return const Center(child: Text('Không có món ăn yêu thích nào'));
+            }
+
             return CustomScrollView(
               slivers: [
                 SliverPadding(

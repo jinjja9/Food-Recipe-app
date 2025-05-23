@@ -15,7 +15,7 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   Future<List<Food>> fetchFoods() async {
-    final snapshot = await FirebaseFirestore.instance.collection('foods').get();
+    final snapshot = await FirebaseFirestore.instance.collection('foods').orderBy('createdAt',descending: true).get();
     return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
   }
 
@@ -45,10 +45,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 ),
               ),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.search, color: Colors.black, size: 28),
-                  onPressed: () {},
-                ),
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline,
                       color: Colors.orange, size: 28),
@@ -81,7 +77,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   final foods = snapshot.data!;
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
-                      (context, index) {
+                          (context, index) {
                         final food = foods[index];
                         return GestureDetector(
                           onTap: () => Navigator.push(

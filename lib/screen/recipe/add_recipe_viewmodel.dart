@@ -92,6 +92,7 @@ class AddRecipeViewModel extends ChangeNotifier {
         'likes': 0,
         'isLiked': false,
         'likedUsers': [],
+        'follower': [],
         'image': imageUrl,
       };
 

@@ -8,7 +8,10 @@ class PopularFoodScreen extends StatelessWidget {
 
   Future<List<Food>> fetchPopularFoods() async {
     final snapshot = await FirebaseFirestore.instance.collection('foods').get();
-    return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
+    final foods = snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
+    // Sort foods by likes in descending order and take top 10
+    foods.sort((a, b) => b.likes.compareTo(a.likes));
+    return foods.take(10).toList();
   }
 
   @override
@@ -32,7 +35,7 @@ class PopularFoodScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0,
             title: const Text(
-              "Món ăn phổ biến",
+              "Top 10 món ăn phổ biến",
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
