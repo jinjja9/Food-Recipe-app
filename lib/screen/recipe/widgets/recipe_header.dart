@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../models/user.dart' as app_user;
 
 import '../../../models/food.dart';
 
@@ -25,6 +26,8 @@ class RecipeHeader extends StatefulWidget implements PreferredSizeWidget {
 
 class _RecipeHeaderState extends State<RecipeHeader> {
   late Stream<DocumentSnapshot> _foodStream;
+  String? _currentRole;
+  String? _currentUid;
 
   @override
   void initState() {
@@ -33,6 +36,19 @@ class _RecipeHeaderState extends State<RecipeHeader> {
         .collection('foods')
         .doc(widget.food.id)
         .snapshots();
+    _currentUid = FirebaseAuth.instance.currentUser?.uid;
+    _fetchCurrentUserRole();
+  }
+
+  Future<void> _fetchCurrentUserRole() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (doc.exists) {
+      setState(() {
+        _currentRole = (doc.data() as Map<String, dynamic>)['role'] ?? 'user';
+      });
+    }
   }
 
   @override
@@ -90,6 +106,41 @@ class _RecipeHeaderState extends State<RecipeHeader> {
             );
           },
         ),
+        if (_currentUid != null && (_currentUid == widget.food.uid || _currentRole == 'admin'))
+          IconButton(
+            icon: Icon(
+              Icons.delete_outline,
+              color: widget.showTitle ? Colors.red : Colors.white,
+            ),
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Xóa món ăn'), content: const Text('Bạn có chắc chắn muốn xóa món ăn này không?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Hủy'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                      child: const Text('Xóa'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                await FirebaseFirestore.instance.collection('foods').doc(widget.food.id).delete();
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã xóa món ăn!')),
+                  );
+                }
+              }
+            },
+          ),
         IconButton(
           icon: Icon(
             Icons.share_rounded,

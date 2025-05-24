@@ -21,6 +21,9 @@ class User {
     this.followers = const [],
   });
 
+  bool get isAdmin => role == 'admin';
+  bool get isUser => role == 'user';
+
   factory User.fromFirestore(String id, Map<String, dynamic> data) {
     return User(
       id: id,
@@ -35,5 +38,18 @@ class User {
           : null,
       followers: List<String>.from(data['followers'] ?? []),
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'avatarImage': avatarImage,
+      'email': email,
+      'password': password,
+      'role': role,
+      'displayName': displayName,
+      'name': name,
+      'createdAt': createdAt?.toIso8601String(),
+      'followers': followers,
+    };
   }
 }

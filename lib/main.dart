@@ -1,3 +1,4 @@
+import 'package:app/screen/home/main_screen.dart';
 import 'package:app/screen/sign_in_up/welcome_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: kbackgroundColor,
       ),
       home: const WelcomeScreen(),
+      //home: const MainScreen(userId: 'cmMssZLRbhWVPdN8uj4f38htNkU2'),
     );
   }
 }

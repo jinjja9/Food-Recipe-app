@@ -37,12 +37,11 @@ class UserService {
     return doc.data();
   }
 
-  static Stream<User?> getAuthStateChanges() {
-    return _auth.authStateChanges();
-  }
-
   static Future<void> signOut() async {
     await _auth.signOut();
   }
   
+  static Stream<User?> getAuthStateChanges() {
+    return _auth.authStateChanges();
+  }
 } 

@@ -39,9 +39,22 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   Future<List<Food>> fetchFoods() async {
     final snapshot = await FirebaseFirestore.instance
         .collection('foods')
-        .where('userId', isEqualTo: widget.userId)
+        .where('uid', isEqualTo: widget.userId)
         .get();
     return snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
+  }
+
+  String formatDate(dynamic createdAt) {
+    if (createdAt == null) return 'N/A';
+    DateTime date;
+    if (createdAt is Timestamp) {
+      date = createdAt.toDate();
+    } else if (createdAt is DateTime) {
+      date = createdAt;
+    } else {
+      return createdAt.toString();
+    }
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
   }
 
   @override
@@ -139,6 +152,36 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                             ),
                           ),
                         ],
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: user.role == "admin" ? Colors.red.withOpacity(0.1) : Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: user.role == "admin" ? Colors.red : Colors.blue,
+                            ),
+                          ),
+                          child: Text(
+                            user.role == "admin" ? "Admin" : "Người dùng",
+                            style: TextStyle(
+                              color: user.role == "admin" ? Colors.red : Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        _buildInfoRow(Icons.email, "Email: ${user.email}"),
+                        const SizedBox(height: 8),
+                        _buildInfoRow(Icons.calendar_today, "Ngày tạo: ${formatDate(user.createdAt)}"),
+                        const SizedBox(height: 8),
+                        FutureBuilder<List<Food>>(
+                          future: _foodsFuture,
+                          builder: (context, foodSnapshot) {
+                            final foodCount = foodSnapshot.data?.length ?? 0;
+                            return _buildInfoRow(Icons.restaurant_menu, "Số món ăn: $foodCount");
+                          },
+                        ),
                         const SizedBox(height: 20),
                       ],
                     );
@@ -271,17 +314,19 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
     );
   }
 
-  Widget _buildProfileStat(String value, String label) {
-    return Column(
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        Icon(icon, size: 20, color: Colors.grey[600]),
+        const SizedBox(width: 8),
         Text(
-          value,
+          text,
           style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black87,
           ),
         ),
-        Text(label),
       ],
     );
   }

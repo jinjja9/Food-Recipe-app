@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/food.dart';
 import '../../widgets/food_card.dart';
 
-class CategoryFoodScreen extends StatelessWidget {
+class CategoryFoodScreen extends StatefulWidget {
   final String category;
   final List<Food> categoryFoods;
 
@@ -12,6 +13,29 @@ class CategoryFoodScreen extends StatelessWidget {
     required this.category,
     required this.categoryFoods,
   });
+
+  @override
+  State<CategoryFoodScreen> createState() => _CategoryFoodScreenState();
+}
+
+class _CategoryFoodScreenState extends State<CategoryFoodScreen> {
+  late List<Food> _foods;
+
+  @override
+  void initState() {
+    super.initState();
+    _foods = widget.categoryFoods;
+  }
+
+  Future<void> _refreshFoods() async {
+    final foodsSnapshot = await FirebaseFirestore.instance
+        .collection('foods')
+        .where('category', isEqualTo: widget.category)
+        .get();
+    setState(() {
+      _foods = foodsSnapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +58,7 @@ class CategoryFoodScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0,
             title: Text(
-              category,
+              widget.category,
               style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -60,10 +84,11 @@ class CategoryFoodScreen extends StatelessWidget {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     return FoodCard(
-                      food: categoryFoods[index],
+                      food: _foods[index],
+                      onFoodUpdated: _refreshFoods,
                     );
                   },
-                  childCount: categoryFoods.length,
+                  childCount: _foods.length,
                 ),
               ),
             ),

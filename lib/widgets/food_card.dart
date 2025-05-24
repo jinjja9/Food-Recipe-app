@@ -8,8 +8,13 @@ import '../screen/recipe/recipe_screen.dart';
 
 class FoodCard extends StatelessWidget {
   final Food food;
+  final Function()? onFoodUpdated;
 
-  const FoodCard({super.key, required this.food});
+  const FoodCard({
+    super.key, 
+    required this.food,
+    this.onFoodUpdated,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,12 +23,21 @@ class FoodCard extends StatelessWidget {
     final uid = user?.uid ?? '';
     final isLiked = food.likedUsers.contains(uid);
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => RecipeScreen(food: food),
-        ),
-      ),
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RecipeScreen(
+              food: food,
+              onFoodUpdated: onFoodUpdated,
+            ),
+          ),
+        );
+        // Gọi callback khi quay lại từ RecipeScreen
+        if (onFoodUpdated != null) {
+          onFoodUpdated!();
+        }
+      },
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -153,6 +167,9 @@ class FoodCard extends StatelessWidget {
                     await foodRef.update({'likedUsers': likedUsers});
                     food.likedUsers = likedUsers;
                     (context as Element).markNeedsBuild();
+                    if (onFoodUpdated != null) {
+                      onFoodUpdated!();
+                    }
                   },
                   padding: EdgeInsets.zero,
                   iconSize: 18,

@@ -13,7 +13,13 @@ import 'widgets/recipe_content.dart';
 
 class RecipeScreen extends StatefulWidget {
   final Food food;
-  const RecipeScreen({super.key, required this.food});
+  final Function()? onFoodUpdated;
+
+  const RecipeScreen({
+    super.key, 
+    required this.food,
+    this.onFoodUpdated,
+  });
 
   @override
   State<RecipeScreen> createState() => _RecipeScreenState();
@@ -21,9 +27,11 @@ class RecipeScreen extends StatefulWidget {
 
 class _RecipeScreenState extends State<RecipeScreen>
     with SingleTickerProviderStateMixin {
+  late Food _food;
   int currentNumber = 1;
   String? categoryName;
-  bool isFavorite = false;
+  bool _isLiked = false;
+  bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();
   bool _showTitle = false;
   late TabController _tabController;
@@ -33,7 +41,9 @@ class _RecipeScreenState extends State<RecipeScreen>
     super.initState();
     _scrollController.addListener(_onScroll);
     _tabController = TabController(length: 2, vsync: this);
-    categoryName = widget.food.category.isNotEmpty ? widget.food.category : 'Chưa có thể loại';
+    _food = widget.food;
+    _isLiked = _food.likedUsers.contains(FirebaseAuth.instance.currentUser?.uid);
+    categoryName = _food.category.isNotEmpty ? _food.category : 'Chưa có thể loại';
   }
 
   @override
@@ -56,13 +66,49 @@ class _RecipeScreenState extends State<RecipeScreen>
     }
   }
 
+  Future<void> _toggleLike() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final uid = user.uid;
+      final foodRef = FirebaseFirestore.instance.collection('foods').doc(_food.id);
+      
+      List<String> likedUsers = List<String>.from(_food.likedUsers);
+      if (_isLiked) {
+        likedUsers.remove(uid);
+      } else {
+        likedUsers.add(uid);
+      }
+
+      await foodRef.update({'likedUsers': likedUsers});
+      
+      setState(() {
+        _food.likedUsers = likedUsers;
+        _isLiked = !_isLiked;
+      });
+
+      // Gọi callback khi trạng thái like thay đổi
+      if (widget.onFoodUpdated != null) {
+        widget.onFoodUpdated!();
+      }
+    } catch (e) {
+      print('Error toggling like: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: RecipeHeader(
-        food: widget.food,
+        food: _food,
         showTitle: _showTitle,
         onFavoriteChanged: (isFavorite) {
           setState(() {});
@@ -73,7 +119,7 @@ class _RecipeScreenState extends State<RecipeScreen>
         slivers: [
           // Hero image
           SliverToBoxAdapter(
-            child: RecipeImage(imageUrl: widget.food.image),
+            child: RecipeImage(imageUrl: _food.image),
           ),
 
           // Recipe content
@@ -83,11 +129,11 @@ class _RecipeScreenState extends State<RecipeScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  RecipeContent(food: widget.food),
+                  RecipeContent(food: _food),
                   const SizedBox(height: 24),
-                  RecipeStats(food: widget.food),
+                  RecipeStats(food: _food),
                   const SizedBox(height: 24),
-                  AuthorInfo(authorId: widget.food.uid),
+                  AuthorInfo(authorId: _food.uid),
                 ],
               ),
             ),

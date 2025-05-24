@@ -20,14 +20,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String currentCat = 'Món Âu';
+  List<Food> _foods = [];
 
   Future<List<Food>> fetchFoods() async {
     final snapshot = await FirebaseFirestore.instance.collection('foods').get();
     print('Số lượng món ăn lấy được: \\${snapshot.docs.length}');
     final foods = snapshot.docs.map((doc) => Food.fromFirestore(doc.data(), doc.id)).toList();
-    // Sort foods by likes in descending order and take top 4
     foods.sort((a, b) => b.likes.compareTo(a.likes));
     return foods.take(4).toList();
+  }
+
+  Future<void> _refreshFoods() async {
+    final foods = await fetchFoods();
+    setState(() {
+      _foods = foods;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshFoods();
   }
 
   @override
@@ -138,16 +151,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              FutureBuilder<List<Food>>(
-                future: fetchFoods(),
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('foods').snapshots(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('Không có món ăn nào'));
+                  final foods = snapshot.data!.docs
+                      .map((doc) => Food.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
+                      .toList();
+                  foods.sort((a, b) => b.likes.compareTo(a.likes));
+                  final topFoods = foods.take(4).toList();
+                  if (topFoods.isEmpty) {
+                    return const Center(child: Text('Không có món ăn phổ biến'));
                   }
-                  final foods = snapshot.data!;
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -157,15 +174,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisSpacing: 15,
                       childAspectRatio: 0.75,
                     ),
-                    itemCount: foods.length,
+                    itemCount: topFoods.length,
                     itemBuilder: (context, index) {
-                      final food = foods[index];
-                      return FoodCard(food: food);
+                      final food = topFoods[index];
+                      return FoodCard(
+                        food: food,
+                        onFoodUpdated: _refreshFoods,
+                      );
                     },
                   );
                 },
-              )
-
+              ),
             ],
           ),
         ),
