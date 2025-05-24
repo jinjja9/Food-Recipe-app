@@ -61,20 +61,25 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
             SliverPadding(
               padding: const EdgeInsets.only(top: 8),
-              sliver: FutureBuilder<List<Food>>(
-                future: fetchFoods(),
+              sliver: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('foods')
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const SliverToBoxAdapter(
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                     return const SliverToBoxAdapter(
                       child: Center(child: Text('Không có món ăn nào')),
                     );
                   }
-                  final foods = snapshot.data!;
+                  final foods = snapshot.data!.docs
+                      .map((doc) => Food.fromFirestore(doc.data() as Map<String, dynamic>, doc.id))
+                      .toList();
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
                           (context, index) {
