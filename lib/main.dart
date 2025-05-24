@@ -27,8 +27,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: kbackgroundColor,
       ),
-      home: const WelcomeScreen(),
-      //home: const MainScreen(userId: 'cmMssZLRbhWVPdN8uj4f38htNkU2'),
+      //home: const WelcomeScreen(),
+      home: const MainScreen(userId: 'cmMssZLRbhWVPdN8uj4f38htNkU2'),
     );
   }
 }

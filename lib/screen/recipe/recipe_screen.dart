@@ -27,6 +27,7 @@ class RecipeScreen extends StatefulWidget {
 
 class _RecipeScreenState extends State<RecipeScreen>
     with SingleTickerProviderStateMixin {
+  late Stream<DocumentSnapshot> _foodStream;
   late Food _food;
   int currentNumber = 1;
   String? categoryName;
@@ -44,6 +45,11 @@ class _RecipeScreenState extends State<RecipeScreen>
     _food = widget.food;
     _isLiked = _food.likedUsers.contains(FirebaseAuth.instance.currentUser?.uid);
     categoryName = _food.category.isNotEmpty ? _food.category : 'Chưa có thể loại';
+    
+    _foodStream = FirebaseFirestore.instance
+        .collection('foods')
+        .doc(_food.id)
+        .snapshots();
   }
 
   @override
@@ -91,7 +97,6 @@ class _RecipeScreenState extends State<RecipeScreen>
         _isLiked = !_isLiked;
       });
 
-      // Gọi callback khi trạng thái like thay đổi
       if (widget.onFoodUpdated != null) {
         widget.onFoodUpdated!();
       }
@@ -104,42 +109,53 @@ class _RecipeScreenState extends State<RecipeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
-      appBar: RecipeHeader(
-        food: _food,
-        showTitle: _showTitle,
-        onFavoriteChanged: (isFavorite) {
-          setState(() {});
-        },
-      ),
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          // Hero image
-          SliverToBoxAdapter(
-            child: RecipeImage(imageUrl: _food.image),
-          ),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: _foodStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data!.exists) {
+          _food = Food.fromFirestore(snapshot.data!.data() as Map<String, dynamic>, snapshot.data!.id);
+          _isLiked = _food.likedUsers.contains(FirebaseAuth.instance.currentUser?.uid);
+          categoryName = _food.category.isNotEmpty ? _food.category : 'Chưa có thể loại';
+        }
 
-          // Recipe content
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  RecipeContent(food: _food),
-                  const SizedBox(height: 24),
-                  RecipeStats(food: _food),
-                  const SizedBox(height: 24),
-                  AuthorInfo(authorId: _food.uid),
-                ],
-              ),
-            ),
+        return Scaffold(
+          backgroundColor: Colors.white,
+          extendBodyBehindAppBar: true,
+          appBar: RecipeHeader(
+            food: _food,
+            showTitle: _showTitle,
+            onFavoriteChanged: (isFavorite) {
+              setState(() {});
+            },
           ),
-        ],
-      ),
+          body: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              // Hero image
+              SliverToBoxAdapter(
+                child: RecipeImage(imageUrl: _food.image),
+              ),
+
+              // Recipe content
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      RecipeContent(food: _food),
+                      const SizedBox(height: 24),
+                      RecipeStats(food: _food),
+                      const SizedBox(height: 24),
+                      AuthorInfo(authorId: _food.uid),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

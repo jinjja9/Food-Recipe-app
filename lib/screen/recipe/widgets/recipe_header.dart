@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../models/user.dart' as app_user;
-
+import '../edit_recipe_screen.dart';
 import '../../../models/food.dart';
 
 class RecipeHeader extends StatefulWidget implements PreferredSizeWidget {
@@ -103,6 +103,21 @@ class _RecipeHeaderState extends State<RecipeHeader> {
                 // The stream listener will handle the UI update, no need to call onFavoriteChanged here
                 // widget.onFavoriteChanged(!isFavorite);
               },
+            );
+          },
+        ),
+        if (_currentUid != null && (_currentUid == widget.food.uid || _currentRole == 'admin'))
+          IconButton(
+            icon: Icon(
+              Icons.edit_outlined,
+              color: widget.showTitle ? Colors.blue : Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditRecipeScreen(food: widget.food),
+                ),
             );
           },
         ),

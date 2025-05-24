@@ -46,7 +46,7 @@ class Categories extends StatelessWidget {
           child: Row(
             children: List.generate(
               displayCategories.length,
-              (index) => GestureDetector(
+                  (index) => GestureDetector(
                 onTap: () {
                   onCategorySelected(displayCategories[index]['name']);
                 },

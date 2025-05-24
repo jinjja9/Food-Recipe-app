@@ -1,87 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../services/cloudinary_service.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CategoryManagementScreen extends StatefulWidget {
   const CategoryManagementScreen({super.key});
 
   @override
-  State<CategoryManagementScreen> createState() =>
-      _CategoryManagementScreenState();
+  State<CategoryManagementScreen> createState() => _CategoryManagementScreenState();
 }
 
 class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   final TextEditingController _categoryNameController = TextEditingController();
-  final TextEditingController _categoryDescriptionController =
-      TextEditingController();
-
-  final List<Map<String, dynamic>> _categories = [
-    {
-      "id": 1,
-      "name": "Món Việt",
-      "description": "Các món ăn truyền thống Việt Nam",
-      "recipeCount": 120,
-      "color": Colors.red,
-    },
-    {
-      "id": 2,
-      "name": "Món Á",
-      "description": "Các món ăn châu Á như Nhật, Hàn, Trung Quốc",
-      "recipeCount": 85,
-      "color": Colors.orange,
-    },
-    {
-      "id": 3,
-      "name": "Món Âu",
-      "description": "Các món ăn phương Tây như Ý, Pháp, Mỹ",
-      "recipeCount": 65,
-      "color": Colors.blue,
-    },
-    {
-      "id": 4,
-      "name": "Món chay",
-      "description": "Các món ăn chay không có thịt",
-      "recipeCount": 45,
-      "color": Colors.green,
-    },
-    {
-      "id": 5,
-      "name": "Đồ uống",
-      "description": "Các loại đồ uống, nước giải khát",
-      "recipeCount": 33,
-      "color": Colors.purple,
-    },
-  ];
-
-  final List<Color> _colorOptions = [
-    Colors.red,
-    Colors.orange,
-    Colors.yellow,
-    Colors.green,
-    Colors.blue,
-    Colors.indigo,
-    Colors.purple,
-    Colors.pink,
-    Colors.teal,
-    Colors.amber,
-  ];
-
-  Color _selectedColor = Colors.red;
+  String? _imageUrl;
+  bool _isUploading = false;
 
   @override
   void dispose() {
     _categoryNameController.dispose();
-    _categoryDescriptionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadImage(StateSetter setStateDialog) async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) return;
+
+      setStateDialog(() {
+        _isUploading = true;
+      });
+
+      final file = File(pickedFile.path);
+      final uploadUrl = Uri.parse('https://api.cloudinary.com/v1_1/${CloudinaryService.cloudName}/image/upload?folder=${CloudinaryService.folderName}');
+
+      final request = http.MultipartRequest('POST', uploadUrl)
+        ..fields['upload_preset'] = CloudinaryService.uploadPreset
+        ..files.add(await http.MultipartFile.fromPath('file', file.path));
+
+      final response = await request.send();
+      final responseData = await response.stream.bytesToString();
+      final result = json.decode(responseData);
+      
+      setStateDialog(() {
+        _imageUrl = result['secure_url'];
+        _isUploading = false;
+      });
+    } catch (e) {
+      print('Error uploading image: $e');
+      setStateDialog(() {
+        _isUploading = false;
+      });
+    }
   }
 
   void _showAddCategoryDialog() {
     _categoryNameController.clear();
-    _categoryDescriptionController.clear();
-    _selectedColor = Colors.red;
+    _imageUrl = null;
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
+        builder: (context, setStateDialog) {
           return AlertDialog(
             title: const Text("Thêm thể loại mới"),
             content: SingleChildScrollView(
@@ -96,46 +79,41 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  TextField(
-                    controller: _categoryDescriptionController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: "Mô tả",
-                      border: OutlineInputBorder(),
+                  GestureDetector(
+                    onTap: _isUploading ? null : () => _pickAndUploadImage(setStateDialog),
+                    child: Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: _isUploading
+                          ? const Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : _imageUrl != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    _imageUrl!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.add_a_photo, size: 50, color: Colors.grey),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Thêm ảnh thể loại',
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    "Chọn màu:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _colorOptions.map((color) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = color;
-                          });
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: _selectedColor == color
-                                  ? Colors.black
-                                  : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
                   ),
                 ],
               ),
@@ -148,26 +126,38 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                 child: const Text("Hủy"),
               ),
               ElevatedButton(
-                onPressed: () {
-                  if (_categoryNameController.text.isNotEmpty) {
-                    setState(() {
-                      _categories.add({
-                        "id": _categories.length + 1,
-                        "name": _categoryNameController.text,
-                        "description": _categoryDescriptionController.text,
-                        "recipeCount": 0,
-                        "color": _selectedColor,
-                      });
-                    });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Đã thêm thể loại mới"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  }
-                },
+                onPressed: _isUploading || _imageUrl == null
+                    ? null
+                    : () async {
+                        if (_categoryNameController.text.isNotEmpty) {
+                          try {
+                            await FirebaseFirestore.instance.collection('categories').add({
+                              'name': _categoryNameController.text,
+                              'imageUrl': _imageUrl,
+                              'createdAt': FieldValue.serverTimestamp(),
+                            });
+                            
+                            if (mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Đã thêm thể loại mới"),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Lỗi: $e"),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                 ),
@@ -180,124 +170,14 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
     );
   }
 
-  void _showEditCategoryDialog(int index) {
-    final category = _categories[index];
-    _categoryNameController.text = category["name"];
-    _categoryDescriptionController.text = category["description"];
-    _selectedColor = category["color"];
-
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: const Text("Chỉnh sửa thể loại"),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _categoryNameController,
-                    decoration: const InputDecoration(
-                      labelText: "Tên thể loại",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _categoryDescriptionController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: "Mô tả",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    "Chọn màu:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _colorOptions.map((color) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = color;
-                          });
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: _selectedColor == color
-                                  ? Colors.black
-                                  : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Hủy"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_categoryNameController.text.isNotEmpty) {
-                    setState(() {
-                      _categories[index] = {
-                        "id": category["id"],
-                        "name": _categoryNameController.text,
-                        "description": _categoryDescriptionController.text,
-                        "recipeCount": category["recipeCount"],
-                        "color": _selectedColor,
-                      };
-                    });
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Đã cập nhật thể loại"),
-                        backgroundColor: Colors.blue,
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                ),
-                child: const Text("Cập nhật"),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  void _showDeleteConfirmation(int index) {
-    final category = _categories[index];
-
+  void _showDeleteConfirmation(String categoryId, String categoryName, int recipeCount) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Xác nhận xóa"),
         content: Text(
-          "Bạn có chắc chắn muốn xóa thể loại '${category["name"]}' không? "
-          "Điều này sẽ ảnh hưởng đến ${category["recipeCount"]} công thức.",
+          "Bạn có chắc chắn muốn xóa thể loại '$categoryName' không? "
+          "Điều này sẽ ảnh hưởng đến $recipeCount công thức.",
         ),
         actions: [
           TextButton(
@@ -307,17 +187,29 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
             child: const Text("Hủy"),
           ),
           ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _categories.removeAt(index);
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Đã xóa thể loại"),
-                  backgroundColor: Colors.red,
-                ),
-              );
+            onPressed: () async {
+              try {
+                await FirebaseFirestore.instance.collection('categories').doc(categoryId).delete();
+                if (mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Đã xóa thể loại"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Lỗi: $e"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -390,8 +282,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -401,61 +292,91 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: ListView.builder(
-                  itemCount: _categories.length,
-                  itemBuilder: (context, index) {
-                    final category = _categories[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        leading: Container(
-                          width: 12,
-                          height: double.infinity,
-                          color: category["color"],
-                        ),
-                        title: Text(
-                          category["name"],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 4),
-                            Text(category["description"]),
-                            const SizedBox(height: 4),
-                            Text(
-                              "${category["recipeCount"]} công thức",
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w500,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance.collection('categories').snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Lỗi: ${snapshot.error}'));
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final categories = snapshot.data!.docs;
+
+                    return ListView.builder(
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final category = categories[index].data() as Map<String, dynamic>;
+                        final categoryId = categories[index].id;
+                        
+                        return StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('foods')
+                              .where('category', isEqualTo: category['name'])
+                              .snapshots(),
+                          builder: (context, foodSnapshot) {
+                            final recipeCount = foodSnapshot.hasData ? foodSnapshot.data!.size : 0;
+                            
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            ),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () => _showEditCategoryDialog(index),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _showDeleteConfirmation(index),
-                            ),
-                          ],
-                        ),
-                        isThreeLine: true,
-                      ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                leading: category['imageUrl'] != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          category['imageUrl'],
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : const Icon(Icons.category, size: 60),
+                                title: Text(
+                                  category['name'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "$recipeCount công thức",
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => _showDeleteConfirmation(
+                                        categoryId,
+                                        category['name'],
+                                        recipeCount,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                isThreeLine: true,
+                              ),
+                            );
+                          },
+                        );
+                      },
                     );
                   },
                 ),
