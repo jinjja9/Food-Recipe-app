@@ -9,6 +9,7 @@ import 'UserDetailScreen.dart';
 
 import '../recipe/add_recipe_screen.dart';
 import 'CategoryManagementScreen.dart';
+import 'AllRecipesScreen.dart';
 
 class UserListScreen extends StatefulWidget {
   const UserListScreen({super.key});
@@ -60,64 +61,6 @@ class _UserListScreenState extends State<UserListScreen> {
         );
       },
     );
-  }
-
-  void _showDeleteUserDialog(Map<String, dynamic> user) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Xóa tài khoản"),
-        content: Text(
-          "Bạn có chắc chắn muốn xóa tài khoản ${user["username"] ?? user["name"]} không? Hành động này không thể hoàn tác và tất cả dữ liệu của người dùng sẽ bị xóa.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("Hủy"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              try {
-                await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(user['uid'])
-                    .delete();
-                await FirebaseAuth.instance.currentUser?.delete();
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Đã xóa tài khoản ${user["username"] ?? user["name"]}')),
-                  );
-                  Navigator.pop(context);
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Lỗi khi xóa tài khoản: $e')),
-                  );
-                }
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text("Xóa"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<int> _getTotalPosts(List users) async {
-    final foodSnapshot = await FirebaseFirestore.instance.collection('foods').get();
-    final foods = foodSnapshot.docs;
-    int total = 0;
-    for (var user in users) {
-      final userId = user['uid'];
-      total += foods.where((food) => food['uid'] == userId).length;
-    }
-    return total;
   }
 
   @override
@@ -280,7 +223,7 @@ class _UserListScreenState extends State<UserListScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AddRecipeScreen(),
+                  builder: (context) => const AllRecipesScreen(),
                 ),
               );
             },
