@@ -134,6 +134,3 @@
 - `status`: Trạng thái công thức (draft, published, archived)
 - `view_count`: Số lượt xem
 
-
-
-### 9. Bảng `steps`
