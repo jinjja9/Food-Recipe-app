@@ -157,7 +157,7 @@ flutter run
 ## 9. Demo App
 Download and experience: [File APK](https://drive.google.com/drive/u/1/folders/1rGQXef4IX5vge6uhrQLHSnMbi03JZIh6)
 
-Below are screenshots demonstrating the main features of the app (you can insert images here):
+Below are screenshots demonstrating the main features of the app:
 
 ### 9.1 User Features
 #### 9.1.1 Login
