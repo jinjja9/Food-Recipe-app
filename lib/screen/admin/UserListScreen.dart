@@ -169,7 +169,6 @@ class _UserListScreenState extends State<UserListScreen> {
                       }
                       var userList = userSnapshot.data!;
 
-                      // Sắp xếp theo filter
                       if (_selectedFilter == "Nhiều bài đăng") {
                         userList.sort((a, b) => (b['foodCount'] as int).compareTo(a['foodCount'] as int));
                       } else if (_selectedFilter == "Mới nhất") {
@@ -180,7 +179,7 @@ class _UserListScreenState extends State<UserListScreen> {
                           final bTime = (b['createdAt'] is Timestamp)
                               ? (b['createdAt'] as Timestamp).toDate()
                               : DateTime.tryParse(b['createdAt'].toString()) ?? DateTime(1970);
-                          return bTime.compareTo(aTime); // Mới nhất lên đầu
+                          return bTime.compareTo(aTime);
                         });
                       }
 

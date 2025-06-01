@@ -173,8 +173,6 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                         const SizedBox(height: 10),
                         _buildInfoRow(Icons.email, "Email: ${user.email}"),
                         const SizedBox(height: 8),
-                        _buildInfoRow(Icons.calendar_today, "Ngày tạo: ${formatDate(user.createdAt)}"),
-                        const SizedBox(height: 8),
                         FutureBuilder<List<Food>>(
                           future: _foodsFuture,
                           builder: (context, foodSnapshot) {

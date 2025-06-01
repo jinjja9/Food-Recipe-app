@@ -1,0 +1,2 @@
+C:/Users/PC/Desktop/Food-Recipe-app/android/app/.cxx/RelWithDebInfo/4v3g1h1t/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/PC/Desktop/Food-Recipe-app/android/app/.cxx/RelWithDebInfo/4v3g1h1t/x86_64/CMakeFiles/rebuild_cache.dir
