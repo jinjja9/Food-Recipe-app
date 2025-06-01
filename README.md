@@ -1,139 +1,365 @@
-# Food-Recipe-app
+# Food Recipe App 🍳
 
-## I. Thiết kế CSDL
-### 1.  System Architecture Diagram(Kiến trúc tổng thể hệ thống)
+## 1. Project Introduction
 
-#### 1. Lớp người dùng (User Layer)
-#### 2. Lớp Client (Client Layer)
+Food Recipe App is a modern recipe management application developed with Flutter and Firebase. This application helps users easily search, share, and manage their favorite recipes.
 
-`Client Layer` là lớp phía người dùng trong kiến trúc phần mềm, nơi thực hiện các tương tác trực tiếp với người dùng thông qua giao diện UI, và xử lý logic quản lý trạng thái thông qua các mô hình như BLoC hoặc Provider.
+### 1.1 Objectives
+- Create an easy-to-use recipe sharing platform
+- Connect the community of cooking enthusiasts
+- Provide efficient recipe management tools
+- Create a user-friendly and intuitive experience
 
-- **UI Components**: Các thành phần giao diện người dùng như màn hình, widget, và các thành phần tương tác.
+### 1.2 Target Users
+- Home cooks
+- Amateur and professional chefs
+- Cooking enthusiasts
+- People learning to cook
+- Recipe sharers
 
-- **BLoC/Provider (State Management)**: Lớp quản lý trạng thái ứng dụng, sử dụng mô hình BLoC (Business Logic Component) hoặc Provider để tách biệt logic nghiệp vụ khỏi UI.
+## 2. Key Features 🌟
 
-- **Repository Layer**: Lớp trung gian đóng vai trò cầu nối giữa UI và các dịch vụ, cung cấp API đồng nhất cho tầng UI và xử lý logic nghiệp vụ.
+### 2.1 User Authentication
+- Secure login and registration
+- Social media authentication
+- Password recovery
+- User profile management
 
-#### 3. Lớp dịch vụ (Service Layer)
+### 2.2 Recipe Management
+- Create, read, update, and delete recipes
+- Categorize recipes
+- Upload recipe images
+- Track cooking time and calories
+- Step-by-step cooking instructions
 
-Đóng vai trò là cầu nối giữa lớp `Repository` và các dịch vụ bên ngoài (như `Firebase`). Nó chứa logic nghiệp vụ cụ thể và xử lý giao tiếp với các API bên ngoài.
+### 2.3 User Experience
+- Beautiful Material Design UI
+- Easy navigation with bottom bar
+- Interactive charts for recipe analytics
+- Responsive design for all platforms
 
-- **Authentication Service**: Xử lý tất cả các hoạt động liên quan đến xác thực như đăng nhập, đăng ký, quên mật khẩu.
-- **Recipe Service**: Quản lý tất cả các hoạt động liên quan đến công thức nấu ăn như tạo, đọc, cập nhật, xóa.
-- **User Service**: Quản lý thông tin người dùng, hồ sơ, và các tương tác giữa người dùng.
-- **Category Service**: Quản lý các danh mục công thức.
-- **Notification Service**: Xử lý việc gửi và nhận thông báo.
-- **Analytics Service**: Thu thập và xử lý dữ liệu phân tích về hành vi người dùng.
+### 2.4 Social Features
+- Comment on recipes
+- Rate recipes
+- Share recipes with others
+- Follow other users
 
-#### 4. Lớp Firebase (Firebase Services)
+## 3. Technical Stack 🛠
 
-- **Firebase Authentication**: Dịch vụ xác thực của Firebase, quản lý đăng nhập/đăng ký người dùng.
+### 3.1 Frontend
+- **Framework**: Flutter SDK 3.5.4
+- **State Management**: Flutter Bloc
+- **UI Components**:
+  - Material Design
+  - Salomon Bottom Bar
+  - FL Chart for data visualization
+- **Image Handling**: Image Picker
 
-- **Firebase Firestore**: , cho phép bạn lưu trữ và truy xuất dữ liệu theo dạng tài liệu (documents) trong các bộ sưu tập (collections). Dùng để lưu comment, công thức nấu ăn
+### 3.2 Backend
+- **Firebase Services**:
+  - Firebase Authentication
+  - Cloud Firestore
+  - Firebase Storage
+  - Firebase Realtime Database
 
-- **Firebase Storage**: Dịch vụ lưu trữ của Firebase, dùng để lưu hình ảnh và video.
+## 4. Supported Platforms 📱
 
-- **Firebase Realtime Database**
+- Android
+- iOS
+- Web
+- Windows
+- Linux
+- macOS
 
-### 2. Data Flow Diagram
+## 5. System Architecture 🏗
 
-**Luồng dữ liệu chính:**
+### 5.1 Architecture Layers
+1. **User Layer**: Direct user interaction through UI
+2. **Client Layer**:
+   - UI Components
+   - State Management (BLoC)
+   - Repository Layer
+3. **Service Layer**:
+   - Authentication Service
+   - Recipe Service
+   - User Service
+   - Category Service
+   - Notification Service
+   - Analytics Service
+4. **Firebase Layer**:
+   - Authentication
+   - Firestore
+   - Storage
+   - Realtime Database
 
-**1. Xác thực**: Người dùng đăng ký/đăng nhập → Hệ thống xác thực → Lưu thông tin vào DB_Users → Trả kết quả cho người dùng.
+## 6. Data Flow 🔄
 
-**2. Quản lý công thức**: Người dùng thêm/xem công thức → Quản lý công thức → Lưu/lấy dữ liệu từ DB_Recipes → Hiển thị cho người dùng.
+### 6.1 Authentication Flow
+- User registration/login
+- System authentication
+- User data storage
+- Response to user
 
-**3. Bình luận & Đánh giá**: Người dùng bình luận/đánh giá → Quản lý bình luận & đánh giá → Lưu vào DB_Comments/DB_Ratings → Hiển thị cho người dùng.
+### 6.2 Recipe Management Flow
+- Recipe creation/viewing
+- Recipe data management
+- Database operations
+- User interface updates
 
-**4. Quản lý người dùng**: Admin quản lý người dùng → Quản lý người dùng → Cập nhật/lấy dữ liệu từ DB_Users → Hiển thị cho admin.
+### 6.3 Social Interaction Flow
+- Comments and ratings
+- Social data management
+- Real-time updates
+- User notifications
 
-**5. Quản lý danh mục**: Admin quản lý danh mục → Quản lý danh mục → Cập nhật/lấy dữ liệu từ DB_Categories → Hiển thị cho admin.
+## 7. Getting Started 🚀
+
+### 7.1 Prerequisites
+- Flutter SDK 3.5.4 or higher
+- Firebase account
+- IDE (VS Code or Android Studio)
+
+### 7.2 Installation
+```bash
+# Clone repository
+git clone https://github.com/yourusername/food-recipe-app.git
+
+# Navigate to project directory
+cd food-recipe-app
+
+# Install dependencies
+flutter pub get
+
+# Run the app
+flutter run
+```
+
+### 7.3 Firebase Setup
+- Create a new Firebase project
+- Add your Firebase configuration
+- Enable Authentication and Firestore
+- Set up Storage rules
+
+## 8. Database Schema 📊
+
+### 8.1 Users
+- User profiles
+- Authentication data
+- User preferences
+
+### 8.2 Recipes
+- Recipe details
+- Ingredients
+- Cooking steps
+- Categories
+- Ratings and comments
+
+## 9. Demo App
+
+Below are screenshots demonstrating the main features of the app (you can insert images here):
+
+### 9.1 User Features
+#### 9.1.1 Login
+<table>
+  <tr>
+    <td><img src="assets\images\Ảnh chụp màn hình 2025-06-01 222137.png"width="200"/></td>
+    <td><img src="assets\images\Ảnh chụp màn hình 2025-06-01 222437.png"width="200"/></td>
+  </tr>
+</table>
+
+#### 9.1.2 Register
+<table>
+  <tr>
+    <td><img src="assets\images\Ảnh chụp màn hình 2025-06-01 222609.png"
+    width="200"/></td>
+    <td><img src="assets\images\Ảnh chụp màn hình 2025-06-01 222618.png"
+    width="200"/></td>
+    <td><img src="assets\images\Ảnh chụp màn hình 2025-06-01 222623.png"
+    width="200"/></td>
+    <td><img src="assets\images\Ảnh chụp màn hình 2025-06-01 222629.png"
+    width="200"/></td>
+   </tr>
+</table>
+
+#### 9.1.3 Search recipes
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 223140.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 223126.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 223202.png"
+    width="200"/></td>
+
+  <tr>  
+</table>
+
+#### 9.1.4 View recipe categories
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 223140.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 223727.png"
+    width="207"/></td>
+  <tr>   
+</table>
 
 
-## I. Nhóm quản lý người dùng và phân quyền (ERD)
-### 1. Bảng `roles` (Vai trò)
+#### 9.1.5 View popular recipes
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 223918.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 223924.png"
+    width="200"/></td>
+  <tr>  
+</table>
 
-- **Mục đích**: Định nghĩa các vai trò trong hệ thống
-- **Các trường chính**:
-
-- `id`: Khóa chính, tự động tăng
-- `name`: Tên vai trò (admin, user), không được trùng lặp
-- `description`: Mô tả chi tiết về vai trò
-- `created_at`: Thời điểm tạo vai trò
-
-
-
-### 2. Bảng `users` (Người dùng)
-
-- **Mục đích**: Lưu trữ thông tin đăng nhập và trạng thái của người dùng
-- **Các trường chính**:
-
-- `id`: Khóa chính, tự động tăng
-- `username`: Tên đăng nhập, không được trùng lặp
-- `email`: Email, không được trùng lặp
-- `password`: Mật khẩu (đã mã hóa)
-- `role_id`: Khóa ngoại liên kết với bảng `roles`, xác định vai trò của người dùng
-- `status`: Trạng thái tài khoản (active, inactive)
-- `join_date`: Ngày tham gia
-- `created_at`, `updated_at`: Thời điểm tạo và cập nhật
+#### 9.1.6 View explore recipes
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 224323.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 224328.png"
+    width="200"/></td>
+  <tr>  
+</table>
 
 
+#### 9.1.7 View favorite recipes
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 224334.png"
+    width="200"/></td>
+  <tr>  
+</table>
+
+#### 9.1.8 Add new recipe
+
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 224700.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 224711.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 224714.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 224723.png"
+    width="200"/></td>
+  <tr> 
+</table>
+
+#### 9.1.9 Edit recipe
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 224959.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225003.png"
+    width="200"/></td>
+  <tr>  
+</table>
+
+#### 9.1.10 Delete recipe
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225009.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225016.png"
+    width="200"/></td>
+  <tr>  
+</table>
 
 
+#### 9.1.11 Save recipes
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225311.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225316.png"
+    width="200"/></td>
+  <tr>  
+</table>
 
-### 3. Bảng `user_profiles` (Thông tin cá nhân)
+#### 9.1.12 View personal information
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225359.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225404.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225408.png"
+    width="200"/></td>
+  <tr>  
+</table>
 
-- **Mục đích**: Lưu trữ thông tin chi tiết về người dùng
-- **Các trường chính**:
+#### 9.1.13 Edit personal information
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225534.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225552.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225556.png"
+    width="200"/></td>
+  <tr>  
+</table>
 
-- `id`: Khóa chính, tự động tăng
-- `user_id`: Khóa ngoại liên kết với bảng `users` (quan hệ 1-1)
-- `full_name`: Họ và tên đầy đủ
-- `avatar_image`: Đường dẫn đến ảnh đại diện
-- `bio`: Tiểu sử/giới thiệu
-- `phone`: Số điện thoại
-- `address`: Địa chỉ
-- `date_of_birth`: Ngày sinh
-- `gender`: Giới tính
-- `created_at`, `updated_at`: Thời điểm tạo và cập nhật
+### 9.2 Admin Features
+#### 9.2.1 Manage user information
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225752.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225805.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225809.png"
+    width="200"/></td>
+  <tr>  
+</table>
 
-
-
-## II. Nhóm quản lý công thức và nội dung
-
-### 6. Bảng `categories` (Danh mục)
-
-- **Mục đích**: Phân loại các công thức nấu ăn
-- **Các trường chính**:
-
-- `id`: Khóa chính, tự động tăng
-- `name`: Tên danh mục
-- `description`: Mô tả về danh mục
-- `color`: Mã màu đại diện cho danh mục
-- `recipe_count`: Số lượng công thức trong danh mục
-- `created_by`: Khóa ngoại liên kết với bảng `users`, người tạo danh mục (admin)
-- `created_at`, `updated_at`: Thời điểm tạo và cập nhật
-
-
-
-
-
-### 7. Bảng `recipes` (Công thức)
-
-- **Mục đích**: Lưu trữ thông tin chính về công thức nấu ăn
-- **Các trường chính**:
-
-- `id`: Khóa chính, tự động tăng
-- `name`: Tên công thức
-- `description`: Mô tả về công thức
-- `image`: Đường dẫn đến hình ảnh món ăn
-- `calories`: Lượng calo
-- `cooking_time`: Thời gian nấu (phút)
-- `user_id`: Khóa ngoại liên kết với bảng `users`, người tạo công thức
-- `category_id`: Khóa ngoại liên kết với bảng `categories`, danh mục của công thức
-- `status`: Trạng thái công thức (draft, published, archived)
-- `view_count`: Số lượt xem
+#### 9.2.2 Manage system recipes
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225931.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225936.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 225939.png"
+    width="200"/></td>
+  <tr>  
+</table>
 
 
+#### 9.2.3 Manage categories
 
-### 9. Bảng `steps`
+<table>
+  <tr>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 230044.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 230052.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 230055.png"
+    width="200"/></td>
+    <td><img src="assets\images\Search recipes\Ảnh chụp màn hình 2025-06-01 230059.png"
+    width="200"/></td>
+  <tr>  
+</table>
+
+
+## 10. Contributing 🤝
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 11. License 📝
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 12. Authors 👥
+
+- Your Name - Initial work
+
+## 13. Acknowledgments 🙏
+
+- Flutter team for the amazing framework
+- Firebase for backend services
+- All contributors who have helped shape this project
